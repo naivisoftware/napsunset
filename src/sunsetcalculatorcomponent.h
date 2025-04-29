@@ -52,9 +52,11 @@ namespace nap
 
 	private:
 		void calculateCurrentSunsetState();
+		double calculatePreviousSunset(int year, int month, int day);
 
-
+		// in minutes
 		double currentSunrise=-1, currentSunset=-1;
+		double previousSunset = -1;
 		int currentSunsetHours, currentSunsetMinutes;
 		int offsetTimeSunsettingDown;
 
@@ -65,7 +67,6 @@ namespace nap
 		long float deltaUntilNextCalculation;
 
 		long float accumulatedTime;
-
 
 
 
