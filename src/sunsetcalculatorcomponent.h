@@ -39,10 +39,11 @@ namespace nap
 		void update(double deltaTime) override;
 
 		/*
-		* Returns a normalised proportion:
-		* positive if the sun is up
-		* negative if the sun is down
-		* of the time left until sundown
+		* Returns a normalised proportion of the time passed :
+		* [1](now - sun rose up) / (sun setting down - sun rose up)
+		* [2](now - previous sun setting down) / (sun rose up - previous sun setting down)
+		* [1] if the time passed is between sun rose up and sun setting down (day time)
+		* [2] if the time passed is between previous sun setting down and sun rose up (night time)
 		*/
 		float getProp();
 
@@ -60,7 +61,7 @@ namespace nap
 		int currentSunsetHours, currentSunsetMinutes;
 		int offsetTimeSunsettingDown;
 
-		float currentPropSunUp;
+		float currentPropSun;
 		bool sunIsCurrentlyUp;
 
 		// deltaUntilNextCalculation the new delta until the calculation of the sunset needs to be done
