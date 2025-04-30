@@ -47,10 +47,7 @@ namespace nap
 	void SunsetCalculatorComponentInstance::update(double delta)
 	{
 
-		if (mDeltaCalculationTimer.getElapsedTime() > mDeltaUntilNextCalculation) {
-
-			calculateCurrentSunsetState();
-		}
+		if (mDeltaCalculationTimer.getElapsedTime() > mDeltaUntilNextCalculation) calculateCurrentSunsetState();
 
 	}
 
@@ -66,7 +63,8 @@ namespace nap
 			mCurrentSunset = sunset->calcSunset();
 			
 		}
-		else {
+		else
+		{
 			mPreviousSunset = mCurrentSunset;
 			mCurrentSunrise = mNextSunrise;
 
@@ -81,11 +79,11 @@ namespace nap
 		mCurrentSunsetMinutes = static_cast<int>(mCurrentSunset) % 60;
 
 		std::string minutesLogged = std::to_string((static_cast<int>(mCurrentSunrise) % 60));
-		if (minutesLogged.size() < 2)minutesLogged.insert(0,1,'0');
+		if (minutesLogged.size() < 2) minutesLogged.insert(0,1,'0');
 
 		Logger::info("SunsetCalculatorComponentInstance::calculateCurrentSunsetState sunrise at :	%d:%s", static_cast<int>(mCurrentSunrise / 60), minutesLogged.c_str());
 		minutesLogged = std::to_string(mCurrentSunsetMinutes);
-		if (minutesLogged.size() < 2)minutesLogged.insert(0, 1, '0');
+		if (minutesLogged.size() < 2) minutesLogged.insert(0, 1, '0');
 		Logger::info("SunsetCalculatorComponentInstance::calculateCurrentSunsetState sunset at  :	%d:%s", mCurrentSunsetHours, minutesLogged.c_str());
 
 
@@ -107,7 +105,7 @@ namespace nap
 		int timePassedSinceMidnight = h * 60 + m;
 
 		mSunIsCurrentlyUp = true;
-		if (timePassedSinceMidnight < mCurrentSunrise)mSunIsCurrentlyUp = false;
+		if (timePassedSinceMidnight < mCurrentSunrise) mSunIsCurrentlyUp = false;
 
 
 		int delta_min = static_cast<int>(mCurrentSunset - mCurrentSunrise);
@@ -118,14 +116,16 @@ namespace nap
 				delta_min = static_cast<int>(mCurrentSunrise - mPreviousSunset + mOffsetTimeSunsettingDown * 60);
 				mCurrentPropSun = timePassedSinceyesterdaysSunDown / delta_min;
 			}
-			else { // evening
+			else
+			{ // evening
 				int timePassedSinceSunDown = h * 60 + m + (mCurrentSunset + mOffsetTimeSunsettingDown * 60);
 				delta_min = static_cast<int>(mNextSunrise + 24 * 60 - (mCurrentSunset + mOffsetTimeSunsettingDown * 60));
 				mCurrentPropSun = timePassedSinceSunDown / delta_min;
 
 			}
 		}
-		else {
+		else
+		{
 
 			mCurrentPropSun = (timePassedSinceMidnight - static_cast<float>(mCurrentSunrise)) / delta_min;
 		}
@@ -133,8 +133,7 @@ namespace nap
 
 	double SunsetCalculatorComponentInstance::calculatePreviousSunset(DateTime date) {
 
-		// go back one day
-
+		// go back one day using std::chrono
 		SystemTimeStamp sysTime = date.getTimeStamp();
 		sysTime -= std::chrono::hours(24);
 		date.setTimeStamp(sysTime);
@@ -146,8 +145,7 @@ namespace nap
 
 	double SunsetCalculatorComponentInstance::calculateNextSunrise(DateTime date) {
 
-		// go forward one day
-
+		// go forward one day using std::chrono
 		SystemTimeStamp sysTime = date.getTimeStamp();
 		sysTime += std::chrono::hours(24);
 		date.setTimeStamp(sysTime);
