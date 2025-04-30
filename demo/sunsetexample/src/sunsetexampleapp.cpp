@@ -69,6 +69,8 @@ namespace nap
 
 
 		sunsetCalculatorComponentInstance = &mSunsetEntity->getComponent<SunsetCalculatorComponentInstance>();
+		sunsetCalculatorComponentInstance->calculateProp();
+
 
 		Logger::info("SunsetexampleApp::prop = %f", sunsetCalculatorComponentInstance->getProp());
 

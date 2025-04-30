@@ -2,6 +2,7 @@
 
 #include <component.h>
 #include "nap/datetime.h"
+#include <nap/timer.h>
 
 
 
@@ -14,10 +15,11 @@ namespace nap
     {
         RTTI_ENABLE(Component)
 		DECLARE_COMPONENT(SunsetCalculatorComponent, SunsetCalculatorComponentInstance)
-        public:
-            
-            double latitude = 0, longitude = 0;
-			int timezone=2;
+
+		public:
+            //Latitude, longitude  and timezone of the location we want to know the sunset of
+            double mLatitude = 0, mLongitude = 0;	///< lat:Greenwich long:equator (nul island)
+			int mTimezone=2;						///< Europe's timezone
     };
 
 
@@ -34,40 +36,83 @@ namespace nap
 		SunsetCalculatorComponentInstance(EntityInstance& entity, Component& resource);
 		~SunsetCalculatorComponentInstance() = default;
 
-		virtual bool init(utility::ErrorState& erroState) override;
+		/**
+		* Initialises the sunset
+		* sunset gets its location(latitude/longitude/timezone) only here, and nowhere else.
+		*/
+		bool init(utility::ErrorState& erroState) override;
 
 		void update(double deltaTime) override;
 
-		/*
-		* Returns a normalised proportion of the time passed :
-		* [1](now - sun rose up) / (sun setting down - sun rose up)
-		* [2](now - previous sun setting down) / (sun rose up - previous sun setting down)
-		* [1] if the time passed is between sun rose up and sun setting down (day time)
-		* [2] if the time passed is between previous sun setting down and sun rose up (night time)
-		*/
-		float getProp();
+		/**
+		 * @brief Calculates sun position proportions and daylight status.
+		 *
+		 * This method computes:
+		 * 1. The proportion (mCurrentPropSun) of the sun's current position
+		 *    relative to its total daytime course (when the sun is up).
+		 * 2. The proportion (mCurrentPropSun) of the sun's current position
+		 *    relative to its total nighttime course (when the sun is down).
+		 * 3. Updates mSunIsCurrentlyUp to indicate whether the sun is currently
+		 *    above the horizon (true) or below it (false).
+		 *
+		 * @note The same variable (mCurrentPropSun) stores different proportions
+		 *       depending on whether it's day or night.
+		 */
+		void calculateProp();
 
-		bool istheSunUp() {
-			return sunIsCurrentlyUp;
-		}
+		/**
+		 * @brief Gets the current sun position proportion.
+		 *
+		 * This method returns the proportion of the sun's progress through its daily cycle:
+		 * - During daytime: Ratio of current sun position to total daytime duration
+		 * - During nighttime: Ratio of current sun position to total nighttime duration
+		 *
+		 * @return float A value in range [0.0, 1.0] representing:
+		 *               - Sun's progress through daytime when sun is up
+		 *               - Sun's progress through nighttime when sun is down
+		 *
+		 */
+		float getProp() {return mCurrentPropSun;}
+
+		/**
+		 * @brief Checks whether the sun is currently above the horizon.
+		 * @return bool `true` if the sun is up (daytime), `false` if down (nighttime).
+		 */
+		bool istheSunUp() {return mSunIsCurrentlyUp;}
 
 	private:
+		/*
+		* Calculates the time of the sunrise and sunset for today at the given location.
+		*/
 		void calculateCurrentSunsetState();
-		double calculatePreviousSunset(int year, int month, int day);
+		/*
+		* Calculates the time of the sunrise and sunset for yesterday at the given location.
+		*/
+		double calculatePreviousSunset(DateTime date);
+		/*
+		* Calculates the time of the sunrise and sunset for tomorrow at the given location.
+		*/
+		double calculateNextSunrise(DateTime date);
 
-		// in minutes
-		double currentSunrise=-1, currentSunset=-1;
-		double previousSunset = -1;
-		int currentSunsetHours, currentSunsetMinutes;
-		int offsetTimeSunsettingDown;
 
-		float currentPropSun;
-		bool sunIsCurrentlyUp;
 
-		// deltaUntilNextCalculation the new delta until the calculation of the sunset needs to be done
-		long float deltaUntilNextCalculation;
+		double  mCurrentSunrise = -1;                   ///< Today's sunrise time in minutes from midnight  
+		double  mCurrentSunset = -1;                    ///< Today's sunset time in minutes from midnight  
+		double  mPreviousSunset = -1;                   ///< Yesterday's sunset time in minutes from midnight
+		double  mNextSunrise = -1;						///< Tomorrow's sunrise time in minutes from midnight  
 
-		long float accumulatedTime;
+
+		int     mCurrentSunsetHours;                    ///< Today's sunset hour component (0-23)  
+		int     mCurrentSunsetMinutes;                  ///< Today's sunset minute component (0-59)  
+		int     mOffsetTimeSunsettingDown;              ///< Additional offset (in hours) after sunset until sun is completely down  
+
+		float   mCurrentPropSun;                        ///< Sun's progress proportion (0.0-1.0): daytime progress when sun is up, nighttime progress when sun is down  
+		bool    mSunIsCurrentlyUp;                      ///< Current daylight status (true = sun is above horizon)  
+
+		long    mDeltaUntilNextCalculation;             ///< Time remaining (s) until next sunset/sunrise calculation  
+
+		nap::SystemTimer mDeltaCalculationTimer;        ///< Timer tracking interval until next required calculation (at next sunset)  
+
 
 
 
