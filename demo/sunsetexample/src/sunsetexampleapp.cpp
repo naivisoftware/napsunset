@@ -55,7 +55,6 @@ namespace nap
 		if (!error.check(mGnomonEntity != nullptr, "unable to find entity with name: %s", "SunsetEntity"))
 			return false;
 
-		sunsetCalculatorComponentInstance = &mSunsetEntity->getComponent<SunsetCalculatorComponentInstance>();
 
 
 		mParameterGUI = mResourceManager->findObject<ParameterGUI>("ParameterGUI");
@@ -73,7 +72,8 @@ namespace nap
 		mInputService->processWindowEvents(*mRenderWindow, input_router, { &mScene->getRootEntity() });
 
 
-		sunsetCalculatorComponentInstance->calculateProp();
+		nap::SunsetCalculatorComponentInstance& sunsetCalculatorComponentInstance = mSunsetEntity->getComponent<SunsetCalculatorComponentInstance>();
+		sunsetCalculatorComponentInstance.calculateProp();
 
 		// Select GUI window
 		mGuiService->selectWindow(mRenderWindow);
@@ -86,12 +86,12 @@ namespace nap
 		// Show all parameters
 		mParameterGUI->show(false);
 
-		bool sunIsUp = sunsetCalculatorComponentInstance->istheSunUp();
+		bool sunIsUp = sunsetCalculatorComponentInstance.istheSunUp();
 
 		// Display some extra info
 		ImGui::Text(getCurrentDateTime().toString().c_str());
 		ImGui::TextColored(theme.mHighlightColor2, "the sun is %s", sunIsUp ? "Up" : "Down");
-		ImGui::TextColored(theme.mHighlightColor3, "%s course purcentage in the %s = %f", sunIsUp ? "Sun" : "Moon", sunIsUp ? "sky" : "night", sunsetCalculatorComponentInstance->getProp());
+		ImGui::TextColored(theme.mHighlightColor3, "%s course purcentage in the %s = %f", sunIsUp ? "Sun" : "Moon", sunIsUp ? "sky" : "night", sunsetCalculatorComponentInstance.getProp());
 
 		ImGui::Text(utility::stringFormat("Framerate: %.02f", getCore().getFramerate()).c_str());
 		ImGui::End();

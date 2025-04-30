@@ -4,8 +4,5 @@
     "RequiredModules": [
         "napmath",
         "napscene"
-    ],
-    "WindowsDllSearchPaths": [
-        "{ROOT}/modules/napsunset/thirdparty/sunset/msvc/x86_64/x64/vc16/bin"
     ]
 }

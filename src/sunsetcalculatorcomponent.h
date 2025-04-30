@@ -6,10 +6,12 @@
 
 
 
+class SunSet;
+
 namespace nap
 {
 	class SunsetCalculatorComponentInstance;
-
+		
 
     class NAPAPI SunsetCalculatorComponent: public Component
     {
@@ -111,16 +113,16 @@ namespace nap
 
 		int mCurrentSunsetHours;						///< Today's sunset hour component (0-23)  
 		int mCurrentSunsetMinutes;						///< Today's sunset minute component (0-59)  
-		int mOffsetTimeSunsettingDown;					///< Additional offset (in hours) after sunset until sun is completely down  
+		int mOffsetTimeSunsettingDown = 1;					///< Additional offset (in hours) after sunset until sun is completely down  : 1h extra to the time of the starting of the sun setting down --> the time the night is dark
 
-		float mCurrentPropSun;							///< Sun's progress proportion (0.0-1.0): daytime progress when sun is up, nighttime progress when sun is down  
+		float mCurrentPropSun = -1;						///< Sun's progress proportion (0.0-1.0): daytime progress when sun is up, nighttime progress when sun is down  
 		bool mSunIsCurrentlyUp;							///< Current daylight status (true = sun is above horizon)  
 
-		long mDeltaUntilNextCalculation;				///< Time remaining (s) until next sunset/sunrise calculation  
+		long mDeltaUntilNextCalculation = 10;				///< Time remaining (s) until next sunset/sunrise calculation  
 
-		nap::SystemTimer mDeltaCalculationTimer;        ///< Timer tracking interval until next required calculation (at next sunset)  
+		nap::SystemTimer mDeltaCalculationTimer;        ///< Timer tracking interval until next required calculation (at next sunset. Settings this to 10s so to not retrigger the calculation of the sunset until mDeltaUntilNextCalculation is properly set inside calculateCurrentSunsetState
 
-
+		std::unique_ptr< SunSet > sunset;				///< unique ptr to the sunset class
 
 
 	};

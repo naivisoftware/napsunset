@@ -83,7 +83,5 @@ namespace nap
 		ResourcePtr<ParameterGUI>	mParameterGUI = nullptr;		///< Draws the parameters to screen
 
 		ObjectPtr<EntityInstance>	mSunsetEntity = nullptr;		///< Pointer to the entity holding the sunset calculator
-		nap::SunsetCalculatorComponentInstance* sunsetCalculatorComponentInstance = nullptr; ///< Pointer to the the sunset calculator Compoent Instance
-
 	};
 }
