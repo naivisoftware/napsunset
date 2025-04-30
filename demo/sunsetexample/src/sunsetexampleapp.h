@@ -13,6 +13,7 @@
 #include <renderwindow.h>
 #include <entity.h>
 #include <app.h>
+#include <parametergui.h>
 
 #include <sunsetcalculatorcomponent.h>
 
@@ -79,9 +80,10 @@ namespace nap
 		ObjectPtr<Scene>			mScene = nullptr;				///< Pointer to the main scene
 		ObjectPtr<EntityInstance>	mCameraEntity = nullptr;		///< Pointer to the entity that holds the perspective camera
 		ObjectPtr<EntityInstance>	mGnomonEntity = nullptr;		///< Pointer to the entity that can render the gnomon
+		ResourcePtr<ParameterGUI>	mParameterGUI = nullptr;		///< Draws the parameters to screen
 
-		ObjectPtr<EntityInstance>	mSunsetEntity = nullptr;
-		nap::SunsetCalculatorComponentInstance* sunsetCalculatorComponentInstance = nullptr;
+		ObjectPtr<EntityInstance>	mSunsetEntity = nullptr;		///< Pointer to the entity holding the sunset calculator
+		nap::SunsetCalculatorComponentInstance* sunsetCalculatorComponentInstance = nullptr; ///< Pointer to the the sunset calculator Compoent Instance
 
 	};
 }

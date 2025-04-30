@@ -6,6 +6,7 @@
 #include <inputrouter.h>
 #include <rendergnomoncomponent.h>
 #include <perspcameracomponent.h>
+#include <imgui/imgui.h>
 
 RTTI_BEGIN_CLASS_NO_DEFAULT_CONSTRUCTOR(nap::sunsetexampleApp)
 	RTTI_CONSTRUCTOR(nap::Core&)
@@ -56,6 +57,9 @@ namespace nap
 
 		sunsetCalculatorComponentInstance = &mSunsetEntity->getComponent<SunsetCalculatorComponentInstance>();
 
+
+		mParameterGUI = mResourceManager->findObject<ParameterGUI>("ParameterGUI");
+
 		// All done!
 		return true;
 	}
@@ -71,8 +75,28 @@ namespace nap
 
 		sunsetCalculatorComponentInstance->calculateProp();
 
+		// Select GUI window
+		mGuiService->selectWindow(mRenderWindow);
 
-		Logger::info("SunsetexampleApp::prop = %f", sunsetCalculatorComponentInstance->getProp());
+
+		const auto& theme = mGuiService->getPalette();
+		// Draw some gui elements
+		ImGui::Begin("Controls");
+
+		// Show all parameters
+		mParameterGUI->show(false);
+
+		bool sunIsUp = sunsetCalculatorComponentInstance->istheSunUp();
+
+		// Display some extra info
+		ImGui::Text(getCurrentDateTime().toString().c_str());
+		ImGui::TextColored(theme.mHighlightColor2, "the sun is %s", sunIsUp ? "Up" : "Down");
+		ImGui::TextColored(theme.mHighlightColor3, "%s course purcentage in the %s = %f", sunIsUp ? "Sun" : "Moon", sunIsUp ? "sky" : "night", sunsetCalculatorComponentInstance->getProp());
+
+		ImGui::Text(utility::stringFormat("Framerate: %.02f", getCore().getFramerate()).c_str());
+		ImGui::End();
+
+
 
 	}
 	
