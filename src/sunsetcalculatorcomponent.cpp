@@ -10,9 +10,9 @@
 std::unique_ptr <SunSet> sunset;
 
 RTTI_BEGIN_CLASS(nap::SunsetCalculatorComponent)
-	RTTI_PROPERTY("latitude", &nap::SunsetCalculatorComponent::mLatitude, nap::rtti::EPropertyMetaData::Default)
-	RTTI_PROPERTY("longitude", &nap::SunsetCalculatorComponent::mLongitude, nap::rtti::EPropertyMetaData::Default)
-	RTTI_PROPERTY("timezone", &nap::SunsetCalculatorComponent::mTimezone, nap::rtti::EPropertyMetaData::Default)
+	RTTI_PROPERTY("latitude", &nap::SunsetCalculatorComponent::mLatitude, nap::rtti::EPropertyMetaData::Default, "latitude of the location we want to know the sunrise and sundown of")
+	RTTI_PROPERTY("longitude", &nap::SunsetCalculatorComponent::mLongitude, nap::rtti::EPropertyMetaData::Default, "longitude of the location we want to know the sunrise and sundown of")
+	RTTI_PROPERTY("timezone", &nap::SunsetCalculatorComponent::mTimezone, nap::rtti::EPropertyMetaData::Default, "timezone to return the date in")
 RTTI_END_CLASS
 
 RTTI_BEGIN_CLASS_NO_DEFAULT_CONSTRUCTOR(nap::SunsetCalculatorComponentInstance)
@@ -46,8 +46,8 @@ namespace nap
 
 	void SunsetCalculatorComponentInstance::update(double delta)
 	{
-
-		if (mDeltaCalculationTimer.getElapsedTime() > mDeltaUntilNextCalculation) calculateCurrentSunsetState();
+		double timePassed = mDeltaCalculationTimer.getElapsedTime();
+		if (timePassed > mDeltaUntilNextCalculation) calculateCurrentSunsetState();
 
 	}
 

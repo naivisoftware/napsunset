@@ -4,5 +4,4 @@
 
  #include "utility/module.h"
 
- NAP_SERVICE_MODULE("napsunset", "0.1.0", "nap::SunsetService")
- 
+ NAP_MODULE("napsunset", "0.1.0")

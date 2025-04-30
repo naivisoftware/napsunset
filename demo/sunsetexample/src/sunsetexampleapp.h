@@ -14,7 +14,6 @@
 #include <entity.h>
 #include <app.h>
 
-#include <sunsetservice.h>
 #include <sunsetcalculatorcomponent.h>
 
 namespace nap
@@ -81,7 +80,6 @@ namespace nap
 		ObjectPtr<EntityInstance>	mCameraEntity = nullptr;		///< Pointer to the entity that holds the perspective camera
 		ObjectPtr<EntityInstance>	mGnomonEntity = nullptr;		///< Pointer to the entity that can render the gnomon
 
-		nap::SunsetService*			mSunsetService = nullptr;
 		ObjectPtr<EntityInstance>	mSunsetEntity = nullptr;
 		nap::SunsetCalculatorComponentInstance* sunsetCalculatorComponentInstance = nullptr;
 

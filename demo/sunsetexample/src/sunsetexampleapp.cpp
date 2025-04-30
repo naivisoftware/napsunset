@@ -25,7 +25,6 @@ namespace nap
 		mInputService	= getCore().getService<nap::InputService>();
 		mGuiService		= getCore().getService<nap::IMGuiService>();
 
-		mSunsetService = getCore().getService<nap::SunsetService>();
 
 		// Fetch the resource manager
 		mResourceManager = getCore().getResourceManager();
@@ -55,6 +54,8 @@ namespace nap
 		if (!error.check(mGnomonEntity != nullptr, "unable to find entity with name: %s", "SunsetEntity"))
 			return false;
 
+		sunsetCalculatorComponentInstance = &mSunsetEntity->getComponent<SunsetCalculatorComponentInstance>();
+
 		// All done!
 		return true;
 	}
@@ -68,7 +69,6 @@ namespace nap
 		mInputService->processWindowEvents(*mRenderWindow, input_router, { &mScene->getRootEntity() });
 
 
-		sunsetCalculatorComponentInstance = &mSunsetEntity->getComponent<SunsetCalculatorComponentInstance>();
 		sunsetCalculatorComponentInstance->calculateProp();
 
 

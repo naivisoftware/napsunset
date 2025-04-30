@@ -1,4 +1,4 @@
-#include "sunsetservice.h"
+
 
 #include <component.h>
 #include "nap/datetime.h"
@@ -9,7 +9,7 @@
 namespace nap
 {
 	class SunsetCalculatorComponentInstance;
-	class SunsetService;
+
 
     class NAPAPI SunsetCalculatorComponent: public Component
     {
@@ -27,7 +27,6 @@ namespace nap
 
 	class NAPAPI SunsetCalculatorComponentInstance : public ComponentInstance {
 
-		friend class SunsetService;
 		RTTI_ENABLE(ComponentInstance)
 	public:
 
@@ -44,6 +43,9 @@ namespace nap
 		*/
 		bool init(utility::ErrorState& erroState) override;
 
+		/**
+		 * Waits until the time has come to recalculate.
+		 */
 		void update(double deltaTime) override;
 
 		/**
