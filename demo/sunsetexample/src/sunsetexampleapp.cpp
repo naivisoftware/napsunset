@@ -73,7 +73,6 @@ namespace nap
 
 
 		nap::SunsetCalculatorComponentInstance& sunsetCalculatorComponentInstance = mSunsetEntity->getComponent<SunsetCalculatorComponentInstance>();
-		sunsetCalculatorComponentInstance.calculateProp();
 
 		// Select GUI window
 		mGuiService->selectWindow(mRenderWindow);
