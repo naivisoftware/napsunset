@@ -21,8 +21,8 @@ RTTI_END_CLASS
 
 namespace nap
 {   
-	SunsetCalculatorComponentInstance::SunsetCalculatorComponentInstance(EntityInstance& entity, Component& resource):
-	ComponentInstance(entity, resource),
+	SunsetCalculatorComponentInstance::SunsetCalculatorComponentInstance(EntityInstance& entity, Component& resource) :
+		ComponentInstance(entity, resource),
 		mSunset(std::make_unique<SunSet>())
 	{
 	}
@@ -97,6 +97,7 @@ namespace nap
 		if (mDeltaUntilNextCalculation > time_until_tomorrow)mDeltaUntilNextCalculation = time_until_tomorrow;
 
 		mDeltaCalculationTimer.reset();
+
 	}
 
 
@@ -106,10 +107,10 @@ namespace nap
 		int h = now.getHour();
 		int m = now.getMinute();
 
-		const double time_passed_since_midnight = static_cast<const double> (h * 60 + m);
+		double time_passed_since_midnight = static_cast<double> (h * 60 + m);
 
 		mSunIsCurrentlyUp = true;
-		if (time_passed_since_midnight < mCurrentSunrise) mSunIsCurrentlyUp = false;
+		if (time_passed_since_midnight < mCurrentSunrise || time_passed_since_midnight > mCurrentSunset) mSunIsCurrentlyUp = false;
 
 
 		double delta_min = static_cast<double>(mCurrentSunset - mCurrentSunrise);
@@ -118,15 +119,15 @@ namespace nap
 		{
 			if (h < 12)
 			{ // morning
-				int time_passed_since_yesterdays_sundown = h * 60 + m + (24 * 60 - (mPreviousSunset + mMinutesOffsetTimeSunsettingDown));		///< in minutes
-				delta_min = static_cast<double>(mCurrentSunrise - mPreviousSunset + mMinutesOffsetTimeSunsettingDown);
-				mCurrentPropSun = time_passed_since_yesterdays_sundown / delta_min;
+				int time_passed_since_yesterdays_sunset = h * 60 + m + (24 * 60 - (mPreviousSunset + mMinutesOffsetTimeSunsettingDown));		///< in minutes
+				delta_min = static_cast<double>(mCurrentSunrise + 24 * 60 - (mPreviousSunset + mMinutesOffsetTimeSunsettingDown));
+				mCurrentPropSun = time_passed_since_yesterdays_sunset / delta_min;
 			}
 			else
 			{ // evening
-				double time_passed_since_sundown = static_cast<double> (h * 60 + m + mMinutesOffsetTimeSunsettingDown) + mCurrentSunset;		///< in minutes
+				double time_passed_since_sunset = static_cast<double> (h * 60 + m - (mCurrentSunset + mMinutesOffsetTimeSunsettingDown));		///< in minutes
 				delta_min = static_cast<double>(mNextSunrise + 24 * 60 - (mCurrentSunset + mMinutesOffsetTimeSunsettingDown));
-				mCurrentPropSun = time_passed_since_sundown / delta_min;
+				mCurrentPropSun = time_passed_since_sunset / delta_min;
 
 			}
 		}

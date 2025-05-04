@@ -105,7 +105,6 @@ namespace nap
 		double calculateNextSunrise(DateTime date);
 
 
-
 		double mCurrentSunrise = -1;					///< Today's sunrise time in minutes from midnight  
 		double mCurrentSunset = -1;						///< Today's sunset time in minutes from midnight  
 		double mPreviousSunset = -1;					///< Yesterday's sunset time in minutes from midnight
