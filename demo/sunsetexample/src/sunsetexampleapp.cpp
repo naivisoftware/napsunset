@@ -175,8 +175,8 @@ namespace nap
 
 	void sunsetexampleApp::onSunIsUpChanged(bool active)
 	{
-		const uint gy = 0;
-
+		
+		// use this callback and check active for sun -> UP(true)/DOWN(false)
 	}
 
 }

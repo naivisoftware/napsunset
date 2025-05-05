@@ -27,6 +27,10 @@ namespace nap
 	{
 	}
 
+	// this is needed for the PIMPL (Pointer To Implementation) to work with the unique_ptr to Sunset in the header
+	SunsetCalculatorComponentInstance::~SunsetCalculatorComponentInstance() {
+
+	}
 
 	bool SunsetCalculatorComponentInstance::init(utility::ErrorState& errorState)
     {
@@ -99,6 +103,11 @@ namespace nap
 		if (mDeltaUntilNextCalculation > time_until_tomorrow)mDeltaUntilNextCalculation = time_until_tomorrow;
 
 		mDeltaCalculationTimer.reset();
+
+		// let's calculate the proportion right now, so
+		// [1] on init it appears right away
+		// [2] when the day or sunset change they appear right away
+		calculateProp();
 
 	}
 

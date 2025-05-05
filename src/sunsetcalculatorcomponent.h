@@ -1,4 +1,4 @@
-
+#pragma once
 
 #include <component.h>
 #include "nap/datetime.h"
@@ -38,7 +38,7 @@ namespace nap
 		 * @param resource the resource this instance was created from.
 		 */
 		SunsetCalculatorComponentInstance(EntityInstance& entity, Component& resource);
-		~SunsetCalculatorComponentInstance() = default;
+		~SunsetCalculatorComponentInstance();
 
 		/**
 		* Initialises the sunset
