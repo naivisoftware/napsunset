@@ -55,6 +55,8 @@ namespace nap
 		if (!error.check(mGnomonEntity != nullptr, "unable to find entity with name: %s", "SunsetEntity"))
 			return false;
 
+		nap::SunsetCalculatorComponentInstance& sunsetCalculatorComponentInstance = mSunsetEntity->getComponent<SunsetCalculatorComponentInstance>();
+		sunsetCalculatorComponentInstance.mSunIsUp.connect(mSunIsUpChangedSlot);
 
 
 		mParameterGUI = mResourceManager->findObject<ParameterGUI>("ParameterGUI");
@@ -91,6 +93,7 @@ namespace nap
 		ImGui::Text(getCurrentDateTime().toString().c_str());
 		ImGui::TextColored(theme.mHighlightColor2, "the sun is %s", sunIsUp ? "Up" : "Down");
 		ImGui::TextColored(theme.mHighlightColor3, "%s course purcentage in the %s = %f", sunIsUp ? "Sun" : "Moon", sunIsUp ? "sky" : "night", sunsetCalculatorComponentInstance.getProp());
+		ImGui::TextColored(theme.mHighlightColor4, "Time until next sun course change (%s) : %i minutes", sunIsUp ? "sunset" : "sunrise", sunsetCalculatorComponentInstance.getTimeUntilNextSunCourseChange());
 
 		ImGui::Text(utility::stringFormat("Framerate: %.02f", getCore().getFramerate()).c_str());
 		ImGui::End();
@@ -168,6 +171,12 @@ namespace nap
 	int sunsetexampleApp::shutdown()
 	{
 		return 0;
+	}
+
+	void sunsetexampleApp::onSunIsUpChanged(bool active)
+	{
+		const uint gy = 0;
+
 	}
 
 }

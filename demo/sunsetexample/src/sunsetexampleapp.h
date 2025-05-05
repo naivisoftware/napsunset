@@ -70,6 +70,14 @@ namespace nap
 		 */
 		virtual int shutdown() override;
 
+		/**
+		* Callback for when the sun is rising or setting down
+		*/
+		void onSunIsUpChanged(bool active);
+		Slot<bool> mSunIsUpChangedSlot = { this, &sunsetexampleApp::onSunIsUpChanged };             ///< Slot to notify the Node when the Video resource it is pointing to is being destructed
+
+
+
 	private:
 		ResourceManager*			mResourceManager = nullptr;		///< Manages all the loaded data
 		RenderService*				mRenderService = nullptr;		///< Render Service that handles render calls
