@@ -1,0 +1,8 @@
+{
+    "Type": "nap::ModuleInfo",
+    "mID": "napsunset",
+    "RequiredModules": [
+        "napmath",
+        "napscene"
+    ]
+}

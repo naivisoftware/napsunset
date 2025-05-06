@@ -7,6 +7,25 @@
 
 [Sunset](https://github.com/buelowp/sunset) library in Nap.
 
-<br>
+## Installation
+Compatible with NAP 0.8 and higher - [package release](https://github.com/napframework/nap/releases) and [source](https://github.com/napframework/nap) context. 
 
-All on `dev` branch until ready for release on the `main` branch. 
+### From ZIP
+
+[Download](https://github.com/naivisoftware/napsunset/archive/refs/heads/main.zip) the module as .zip archive and install it into the nap `modules` directory:
+```
+cd tools
+./install_module.sh ~/Downloads/napsunset-main.zip
+```
+
+### From Repository
+
+Clone the repository and setup the module in the nap `modules` directory.
+
+```
+cd modules
+clone https://github.com/naivisoftware/napsunset.git
+./../tools/setup_module.sh napsunset
+```
+
+## Demo
