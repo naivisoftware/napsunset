@@ -5,10 +5,10 @@
 	
 # Description
 
-[Sunset](https://github.com/buelowp/sunset) library in Nap.
+Calculates the sunset & sunrise based on longitude, latitude and time using the [Sunset](https://github.com/buelowp/sunset) library in Nap.
 
 ## Installation
-Compatible with NAP 0.8 and higher - [package release](https://github.com/napframework/nap/releases) and [source](https://github.com/napframework/nap) context. 
+Compatible with NAP 0.7 and higher - [package release](https://github.com/napframework/nap/releases) and [source](https://github.com/napframework/nap) context. 
 
 ### From ZIP
 
@@ -29,3 +29,5 @@ clone https://github.com/naivisoftware/napsunset.git
 ```
 
 ## Demo
+
+Includes a simple demo that shows if the sun is up or down based on the provided settings of the `nap::SunsetCalculatorComponent`
