@@ -8,7 +8,7 @@
 #include <perspcameracomponent.h>
 #include <imgui/imgui.h>
 
-RTTI_BEGIN_CLASS_NO_DEFAULT_CONSTRUCTOR(nap::sunsetexampleApp)
+RTTI_BEGIN_CLASS_NO_DEFAULT_CONSTRUCTOR(nap::SunsetExampleApp)
 	RTTI_CONSTRUCTOR(nap::Core&)
 RTTI_END_CLASS
 
@@ -18,7 +18,7 @@ namespace nap
 	 * Initialize all the resources and instances used for drawing
 	 * slowly migrating all functionality to NAP
 	 */
-	bool sunsetexampleApp::init(utility::ErrorState& error)
+	bool SunsetExampleApp::init(utility::ErrorState& error)
 	{
 		// Retrieve services
 		mRenderService	= getCore().getService<nap::RenderService>();
@@ -67,7 +67,7 @@ namespace nap
 	
 	
 	// Update app
-	void sunsetexampleApp::update(double deltaTime)
+	void SunsetExampleApp::update(double deltaTime)
 	{
 		// Use a default input router to forward input events (recursively) to all input components in the default scene
 		nap::DefaultInputRouter input_router(true);
@@ -104,7 +104,7 @@ namespace nap
 	
 	
 	// Render app
-	void sunsetexampleApp::render()
+	void SunsetExampleApp::render()
 	{
 		// Signal the beginning of a new frame, allowing it to be recorded.
 		// The system might wait until all commands that were previously associated with the new frame have been processed on the GPU.
@@ -144,13 +144,13 @@ namespace nap
 	}
 	
 
-	void sunsetexampleApp::windowMessageReceived(WindowEventPtr windowEvent)
+	void SunsetExampleApp::windowMessageReceived(WindowEventPtr windowEvent)
 	{
 		mRenderService->addEvent(std::move(windowEvent));
 	}
 	
 	
-	void sunsetexampleApp::inputMessageReceived(InputEventPtr inputEvent)
+	void SunsetExampleApp::inputMessageReceived(InputEventPtr inputEvent)
 	{
 		if (inputEvent->get_type().is_derived_from(RTTI_OF(nap::KeyPressEvent)))
 		{
@@ -168,12 +168,12 @@ namespace nap
 	}
 
 	
-	int sunsetexampleApp::shutdown()
+	int SunsetExampleApp::shutdown()
 	{
 		return 0;
 	}
 
-	void sunsetexampleApp::onSunIsUpChanged(bool active)
+	void SunsetExampleApp::onSunIsUpChanged(bool active)
 	{
 		
 		// use this callback and check active for sun -> UP(true)/DOWN(false)

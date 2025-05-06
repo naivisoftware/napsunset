@@ -24,7 +24,7 @@ namespace nap
 	/**
 	 * Main application that is called from within the main loop
 	 */
-	class sunsetexampleApp : public App
+	class SunsetExampleApp : public App
 	{
 		RTTI_ENABLE(App)
 	public:
@@ -32,7 +32,7 @@ namespace nap
 		 * Constructor
 		 * @param core instance of the NAP core system
 		 */
-		sunsetexampleApp(nap::Core& core) : App(core) { }
+		SunsetExampleApp(nap::Core& core) : App(core) { }
 		
 		/**
 		 * Initialize all the services and app specific data structures
@@ -74,7 +74,7 @@ namespace nap
 		* Callback for when the sun is rising or setting down
 		*/
 		void onSunIsUpChanged(bool active);
-		Slot<bool> mSunIsUpChangedSlot = { this, &sunsetexampleApp::onSunIsUpChanged };             ///< Slot to notify the Node when the Video resource it is pointing to is being destructed
+		Slot<bool> mSunIsUpChangedSlot = { this, &SunsetExampleApp::onSunIsUpChanged };             ///< Slot to notify the Node when the Video resource it is pointing to is being destructed
 
 
 

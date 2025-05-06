@@ -24,13 +24,13 @@ namespace nap
 	SunsetCalculatorComponentInstance::SunsetCalculatorComponentInstance(EntityInstance& entity, Component& resource) :
 		ComponentInstance(entity, resource),
 		mSunset(std::make_unique<SunSet>())
-	{
-	}
+	{ }
+
+
 
 	// this is needed for the PIMPL (Pointer To Implementation) to work with the unique_ptr to Sunset in the header
-	SunsetCalculatorComponentInstance::~SunsetCalculatorComponentInstance() {
+	SunsetCalculatorComponentInstance::~SunsetCalculatorComponentInstance() { }
 
-	}
 
 	bool SunsetCalculatorComponentInstance::init(utility::ErrorState& errorState)
     {
@@ -44,6 +44,7 @@ namespace nap
         return true;
     }
 
+
 	void SunsetCalculatorComponentInstance::update(double delta)
 	{
 		const long time_passed_since_calculations = static_cast<long>(mDeltaCalculationTimer.getElapsedTime());
@@ -52,6 +53,7 @@ namespace nap
 		if (time_passed_since_calculations > mDeltaUntilNextCalculation) calculateCurrentSunsetState();
 
 	}
+
 
 	void SunsetCalculatorComponentInstance::calculateCurrentSunsetState()
 	{
@@ -89,7 +91,6 @@ namespace nap
 		if (minutes_logged.size() < 2) minutes_logged.insert(0, 1, '0');
 		Logger::info("SunsetCalculatorComponentInstance::calculateCurrentSunsetState sunset at  :	%d:%s", mCurrentSunsetHours, minutes_logged.c_str());
 
-
 		int h = now.getHour();
 		int m = now.getMinute();
 
@@ -118,7 +119,7 @@ namespace nap
 		int h = now.getHour();
 		int m = now.getMinute();
 
-		double time_passed_since_midnight = static_cast<double> (h * 60 + m);
+		auto time_passed_since_midnight = static_cast<double> (h * 60 + m);
 
 		mSunIsCurrentlyUp = true;
 
@@ -132,8 +133,7 @@ namespace nap
 		}
 
 
-
-		double delta_min = static_cast<double>(mCurrentSunset - mCurrentSunrise);
+		auto delta_min = static_cast<double>(mCurrentSunset - mCurrentSunrise);
 
 		if (!mSunIsCurrentlyUp)
 		{
@@ -146,7 +146,7 @@ namespace nap
 			}
 			else
 			{ // evening
-				double time_passed_since_sunset = static_cast<double> (h * 60 + m - (mCurrentSunset + mMinutesOffsetTimeSunsettingDown));		///< in minutes
+				auto time_passed_since_sunset = static_cast<double>(h * 60 + m - (mCurrentSunset + mMinutesOffsetTimeSunsettingDown));		///< in minutes
 				mTimeUntilNextSunchange = static_cast<int>(mNextSunrise + 24 * 60 -(h * 60 + m));
 				delta_min = static_cast<double>(mNextSunrise + 24 * 60 - (mCurrentSunset + mMinutesOffsetTimeSunsettingDown));
 				mCurrentPropSun = time_passed_since_sunset / delta_min;
@@ -159,6 +159,7 @@ namespace nap
 			mCurrentPropSun = (time_passed_since_midnight - static_cast<float>(mCurrentSunrise)) / delta_min;
 		}
 	}
+
 
 	double SunsetCalculatorComponentInstance::calculatePreviousSunset(DateTime date)
 	{
@@ -173,6 +174,7 @@ namespace nap
 		
 	}
 
+
 	double SunsetCalculatorComponentInstance::calculateNextSunrise(DateTime date)
 	{
 
@@ -183,7 +185,5 @@ namespace nap
 
 		mSunset->setCurrentDate(date.getYear(), static_cast<int>(date.getMonth()), date.getDayInTheMonth());
 		return mSunset->calcSunrise();
-
 	}
-
 }

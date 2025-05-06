@@ -11,8 +11,10 @@ class SunSet;
 namespace nap
 {
 	class SunsetCalculatorComponentInstance;
-		
 
+	/**
+	 * Calculates sunset and sunrise for a given lat and longitude
+	 */
     class NAPAPI SunsetCalculatorComponent: public Component
     {
         RTTI_ENABLE(Component)
@@ -23,12 +25,16 @@ namespace nap
 			// Geographic coordinates and timezone for calculating sun position
 			double mLatitude = 0;					///<  Property: 'latitude' set to use 0	(Greenwich)	->(nul island)
 			double mLongitude = 0;					///<  Property: 'longitude' set to use 0(equator)	->(nul island)
-			int mTimezone=2;						///<  Property: 'timezone' set to use 2 (Europe's timezone)
-			int mMinutesOffsetSunDown=0;			///<  Property: 'minutesOffsetSunDown' offset from the moment the sun start setting down to the moment we consider the sun to be completely down - set to 0
+			int mTimezone = 2;						///<  Property: 'timezone' set to use 2 (Europe's timezone)
+			int mMinutesOffsetSunDown = 0;			///<  Property: 'minutesOffsetSunDown' offset from the moment the sun start setting down to the moment we consider the sun to be completely down - set to 0
     };
 
 
-	class NAPAPI SunsetCalculatorComponentInstance : public ComponentInstance {
+	/**
+	 * Calculates sunset and sunrise for a given lat and longitude
+	 */
+	class NAPAPI SunsetCalculatorComponentInstance : public ComponentInstance
+	{
 
 		RTTI_ENABLE(ComponentInstance)
 	public:
@@ -38,7 +44,9 @@ namespace nap
 		 * @param resource the resource this instance was created from.
 		 */
 		SunsetCalculatorComponentInstance(EntityInstance& entity, Component& resource);
-		~SunsetCalculatorComponentInstance();
+
+		// Destructor
+		~SunsetCalculatorComponentInstance() override;
 
 		/**
 		* Initialises the sunset
@@ -131,8 +139,6 @@ namespace nap
 
 		nap::SystemTimer mDeltaCalculationTimer;        ///< Timer tracking interval until next required calculation (at next sunset. Settings this to 10s so to not retrigger the calculation of the sunset until mDeltaUntilNextCalculation is properly set inside calculateCurrentSunsetState
 
-		std::unique_ptr< SunSet > mSunset;				///< unique ptr to the sunset class
-
-
+		std::unique_ptr<SunSet> mSunset = nullptr;		///< unique ptr to the sunset class
 	};
 }
