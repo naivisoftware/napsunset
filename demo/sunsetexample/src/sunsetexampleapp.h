@@ -1,3 +1,7 @@
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/. */
+
 #pragma once
 
 // Core includes
@@ -6,13 +10,13 @@
 
 // Module includes
 #include <renderservice.h>
-#include <imguiservice.h>
 #include <sceneservice.h>
 #include <inputservice.h>
 #include <scene.h>
 #include <renderwindow.h>
 #include <entity.h>
 #include <app.h>
+#include <imguiservice.h>
 #include <parametergui.h>
 
 #include <sunsetcalculatorcomponent.h>

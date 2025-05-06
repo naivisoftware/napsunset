@@ -1,11 +1,14 @@
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/. */
+
 #include "sunsetcalculatorcomponent.h"
 
 #include <entity.h>
 #include <nap/core.h>
 #include <nap/logger.h>
-#include "nap/datetime.h"
-
-#include "Sunset.cpp"
+#include <nap/datetime.h>
+#include <sunset.h>
 
 RTTI_BEGIN_CLASS(nap::SunsetCalculatorComponent)
 RTTI_PROPERTY("latitude", &nap::SunsetCalculatorComponent::mLatitude, nap::rtti::EPropertyMetaData::Default, "latitude of the location we want to know the sunrise and sundown of")

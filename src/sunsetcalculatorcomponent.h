@@ -1,11 +1,15 @@
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/. */
+
 #pragma once
 
 #include <component.h>
-#include "nap/datetime.h"
+#include <nap/datetime.h>
 #include <nap/timer.h>
 #include <nap/signalslot.h>
 
-
+// Forward declare thirdparty-sunset
 class SunSet;
 
 namespace nap
