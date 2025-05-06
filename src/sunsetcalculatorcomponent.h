@@ -97,8 +97,7 @@ namespace nap
 		 * @brief Checks whether the sun is currently above the horizon.
 		 * @return bool `true` if the sun is up (daytime), `false` if down (nighttime).
 		 */
-		bool istheSunUp() {return mSunIsCurrentlyUp;}
-
+		bool isUp() {return mSunIsCurrentlyUp;}
 
 		/**
 		* @return an int value (in minutes) corresponding to the time until the next sunrise or sunset

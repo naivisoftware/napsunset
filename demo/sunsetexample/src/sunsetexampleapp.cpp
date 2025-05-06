@@ -2,10 +2,9 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/. */
 
-// Local includes
 #include "sunsetexampleapp.h"
 
-// External includes
+// External Includes
 #include <utility/fileutils.h>
 #include <nap/logger.h>
 #include <inputrouter.h>
@@ -31,7 +30,6 @@ namespace nap
 		mInputService	= getCore().getService<nap::InputService>();
 		mGuiService		= getCore().getService<nap::IMGuiService>();
 
-
 		// Fetch the resource manager
 		mResourceManager = getCore().getResourceManager();
 
@@ -55,16 +53,10 @@ namespace nap
 		if (!error.check(mGnomonEntity != nullptr, "unable to find entity with name: %s", "GnomonEntity"))
 			return false;
 
-
+		// Get the sunset entity
 		mSunsetEntity = mScene->findEntity("SunsetEntity");
 		if (!error.check(mGnomonEntity != nullptr, "unable to find entity with name: %s", "SunsetEntity"))
 			return false;
-
-		nap::SunsetCalculatorComponentInstance& sunsetCalculatorComponentInstance = mSunsetEntity->getComponent<SunsetCalculatorComponentInstance>();
-		sunsetCalculatorComponentInstance.mSunIsUp.connect(mSunIsUpChangedSlot);
-
-
-		mParameterGUI = mResourceManager->findObject<ParameterGUI>("ParameterGUI");
 
 		// All done!
 		return true;
@@ -77,34 +69,24 @@ namespace nap
 		// Use a default input router to forward input events (recursively) to all input components in the default scene
 		nap::DefaultInputRouter input_router(true);
 		mInputService->processWindowEvents(*mRenderWindow, input_router, { &mScene->getRootEntity() });
-
-
-		nap::SunsetCalculatorComponentInstance& sunsetCalculatorComponentInstance = mSunsetEntity->getComponent<SunsetCalculatorComponentInstance>();
+		auto& sunsetCalculatorComponentInstance = mSunsetEntity->getComponent<SunsetCalculatorComponentInstance>();
 
 		// Select GUI window
 		mGuiService->selectWindow(mRenderWindow);
-
-
-		const auto& theme = mGuiService->getPalette();
+		
 		// Draw some gui elements
 		ImGui::Begin("Controls");
 
-		// Show all parameters
-		mParameterGUI->show(false);
-
-		bool sunIsUp = sunsetCalculatorComponentInstance.istheSunUp();
-
 		// Display some extra info
+		bool is_up = sunsetCalculatorComponentInstance.isUp();
+		const auto& theme = mGuiService->getPalette();
 		ImGui::Text(getCurrentDateTime().toString().c_str());
-		ImGui::TextColored(theme.mHighlightColor2, "the sun is %s", sunIsUp ? "Up" : "Down");
-		ImGui::TextColored(theme.mHighlightColor3, "%s course purcentage in the %s = %f", sunIsUp ? "Sun" : "Moon", sunIsUp ? "sky" : "night", sunsetCalculatorComponentInstance.getProp());
-		ImGui::TextColored(theme.mHighlightColor4, "Time until next sun course change (%s) : %i minutes", sunIsUp ? "sunset" : "sunrise", sunsetCalculatorComponentInstance.getTimeUntilNextSunCourseChange());
+		ImGui::TextColored(is_up ? theme.mHighlightColor2 : theme.mHighlightColor4, "The sun is: %s", is_up ? "Up" : "Down");
+		ImGui::TextColored(theme.mHighlightColor1, "%s course percentage in the %s = %f", is_up ? "Sun" : "Moon", is_up ? "sky" : "night", sunsetCalculatorComponentInstance.getProp());
+		ImGui::TextColored(theme.mHighlightColor3, "Time until next sun course change (%s) : %i minutes", is_up ? "sunset" : "sunrise", sunsetCalculatorComponentInstance.getTimeUntilNextSunCourseChange());
 
 		ImGui::Text(utility::stringFormat("Framerate: %.02f", getCore().getFramerate()).c_str());
 		ImGui::End();
-
-
-
 	}
 	
 	
@@ -177,11 +159,4 @@ namespace nap
 	{
 		return 0;
 	}
-
-	void SunsetExampleApp::onSunIsUpChanged(bool active)
-	{
-		
-		// use this callback and check active for sun -> UP(true)/DOWN(false)
-	}
-
 }

@@ -10,15 +10,13 @@
 
 // Module includes
 #include <renderservice.h>
+#include <imguiservice.h>
 #include <sceneservice.h>
 #include <inputservice.h>
 #include <scene.h>
 #include <renderwindow.h>
 #include <entity.h>
 #include <app.h>
-#include <imguiservice.h>
-#include <parametergui.h>
-
 #include <sunsetcalculatorcomponent.h>
 
 namespace nap
@@ -74,14 +72,6 @@ namespace nap
 		 */
 		virtual int shutdown() override;
 
-		/**
-		* Callback for when the sun is rising or setting down
-		*/
-		void onSunIsUpChanged(bool active);
-		Slot<bool> mSunIsUpChangedSlot = { this, &SunsetExampleApp::onSunIsUpChanged };             ///< Slot to notify the Node when the Video resource it is pointing to is being destructed
-
-
-
 	private:
 		ResourceManager*			mResourceManager = nullptr;		///< Manages all the loaded data
 		RenderService*				mRenderService = nullptr;		///< Render Service that handles render calls
@@ -92,8 +82,6 @@ namespace nap
 		ObjectPtr<Scene>			mScene = nullptr;				///< Pointer to the main scene
 		ObjectPtr<EntityInstance>	mCameraEntity = nullptr;		///< Pointer to the entity that holds the perspective camera
 		ObjectPtr<EntityInstance>	mGnomonEntity = nullptr;		///< Pointer to the entity that can render the gnomon
-		ResourcePtr<ParameterGUI>	mParameterGUI = nullptr;		///< Draws the parameters to screen
-
 		ObjectPtr<EntityInstance>	mSunsetEntity = nullptr;		///< Pointer to the entity holding the sunset calculator
 	};
 }

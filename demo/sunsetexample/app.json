@@ -6,7 +6,7 @@
     "RequiredModules": [
         "napapp",
         "napcameracontrol",
-        "napparametergui",
+        "napimgui",
         "napsunsetexample"
     ],
     "Data": "data/objects.json",
