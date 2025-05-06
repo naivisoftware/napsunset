@@ -37,8 +37,7 @@ namespace nap
 
 	bool SunsetCalculatorComponentInstance::init(utility::ErrorState& errorState)
     {
-		nap::SunsetCalculatorComponent* resource = getComponent<nap::SunsetCalculatorComponent>();
-
+		auto* resource = getComponent<nap::SunsetCalculatorComponent>();
 		mMinutesOffsetTimeSunsettingDown = resource->mMinutesOffsetSunDown;
 		mSunset->setPosition(resource->mLatitude, resource->mLongitude, resource->mTimezone);
 
@@ -50,19 +49,21 @@ namespace nap
 
 	void SunsetCalculatorComponentInstance::update(double delta)
 	{
-		const long time_passed_since_calculations = static_cast<long>(mDeltaCalculationTimer.getElapsedTime());
-		if(time_passed_since_calculations%60==0)calculateProp();
+		// Update sunset state when time has passed
+		auto time_passed = mDeltaCalculationTimer.getSeconds().count();
+		if (time_passed > mDeltaUntilNextCalculation)
+			calculateCurrentSunsetState();
 
-		if (time_passed_since_calculations > mDeltaUntilNextCalculation) calculateCurrentSunsetState();
-
+		// Update sun proportions every minute
+		auto calc_diff = std::chrono::duration_cast<nap::Minutes>(getCurrentTime() - mCalcStamp);
+		if (calc_diff.count() > 0)
+			calculateProp();
 	}
 
 
 	void SunsetCalculatorComponentInstance::calculateCurrentSunsetState()
 	{
-
 		auto now = getCurrentDateTime();
-
 		if (mPreviousSunset == -1)
 		{
 			mPreviousSunset = calculatePreviousSunset(now);
@@ -76,23 +77,17 @@ namespace nap
 		{
 			mPreviousSunset = mCurrentSunset;
 			mCurrentSunrise = mNextSunrise;
-
 			mNextSunrise = calculateNextSunrise(now);
 			mSunset->setCurrentDate(now.getYear(), static_cast<int>(now.getMonth()), now.getDayInTheMonth());
 			mCurrentSunset = mSunset->calcSunset();
 		}
 
 		mCurrentSunsetHours = std::chrono::duration_cast<std::chrono::hours>(std::chrono::minutes(static_cast<int>(mCurrentSunset) + mMinutesOffsetTimeSunsettingDown)).count();
-
 		mCurrentSunsetMinutes = static_cast<int>(mCurrentSunset) % 60;
 
-		std::string minutes_logged = std::to_string((static_cast<int>(mCurrentSunrise) % 60));
-		if (minutes_logged.size() < 2) minutes_logged.insert(0,1,'0');
-
-		Logger::info("SunsetCalculatorComponentInstance::calculateCurrentSunsetState sunrise at :	%d:%s", static_cast<int>(mCurrentSunrise / 60), minutes_logged.c_str());
-		minutes_logged = std::to_string(mCurrentSunsetMinutes);
-		if (minutes_logged.size() < 2) minutes_logged.insert(0, 1, '0');
-		Logger::info("SunsetCalculatorComponentInstance::calculateCurrentSunsetState sunset at  :	%d:%s", mCurrentSunsetHours, minutes_logged.c_str());
+		int minutes_logged = static_cast<int>(mCurrentSunrise) % 60;
+		Logger::info("SunsetCalculatorComponentInstance::calculateCurrentSunsetState sunrise at: %.2d:%.2d", static_cast<int>(mCurrentSunrise / 60), minutes_logged);
+		Logger::info("SunsetCalculatorComponentInstance::calculateCurrentSunsetState sunset at:	%.2d:%.2d", mCurrentSunsetHours, mCurrentSunsetMinutes);
 
 		int h = now.getHour();
 		int m = now.getMinute();
@@ -101,10 +96,11 @@ namespace nap
 		mDeltaUntilNextCalculation = (mCurrentSunset + mMinutesOffsetTimeSunsettingDown - (h * 60 + m)) * 60;
 
 		// time until it's tomorrow + 1s
-		const double time_until_tomorrow = static_cast<double>((24 * 60 - (h * 60 + m)) * 60 + 1);
+		auto time_until_tomorrow = static_cast<double>((24 * 60 - (h * 60 + m)) * 60 + 1);
 
 		// check if we should recalculate when the day changes (00:00) or at the next sunset.
-		if (mDeltaUntilNextCalculation > time_until_tomorrow)mDeltaUntilNextCalculation = time_until_tomorrow;
+		if (mDeltaUntilNextCalculation > time_until_tomorrow)
+			mDeltaUntilNextCalculation = time_until_tomorrow;
 
 		mDeltaCalculationTimer.reset();
 
@@ -112,7 +108,6 @@ namespace nap
 		// [1] on init it appears right away
 		// [2] when the day or sunset change they appear right away
 		calculateProp();
-
 	}
 
 
@@ -125,9 +120,9 @@ namespace nap
 		auto time_passed_since_midnight = static_cast<double> (h * 60 + m);
 
 		mSunIsCurrentlyUp = true;
-
 		bool sun_up_in_the_sky = true;
-		if (time_passed_since_midnight < mCurrentSunrise || time_passed_since_midnight > mCurrentSunset) sun_up_in_the_sky = false;
+		if (time_passed_since_midnight < mCurrentSunrise || time_passed_since_midnight > mCurrentSunset)
+			sun_up_in_the_sky = false;
 		
 		if (sun_up_in_the_sky != mSunIsCurrentlyUp)
 		{
@@ -135,9 +130,7 @@ namespace nap
 			mSunIsUp.trigger(mSunIsCurrentlyUp);
 		}
 
-
 		auto delta_min = static_cast<double>(mCurrentSunset - mCurrentSunrise);
-
 		if (!mSunIsCurrentlyUp)
 		{
 			if (h < 12)
@@ -161,6 +154,9 @@ namespace nap
 			mTimeUntilNextSunchange = static_cast<int>(mCurrentSunset + mMinutesOffsetTimeSunsettingDown) - (h * 60 + m);
 			mCurrentPropSun = (time_passed_since_midnight - static_cast<float>(mCurrentSunrise)) / delta_min;
 		}
+
+		// Store time reference
+		mCalcStamp = getCurrentTime();
 	}
 
 
@@ -180,7 +176,6 @@ namespace nap
 
 	double SunsetCalculatorComponentInstance::calculateNextSunrise(DateTime date)
 	{
-
 		// go forward one day using std::chrono
 		SystemTimeStamp sysTime = date.getTimeStamp();
 		sysTime += std::chrono::hours(24);
