@@ -8,6 +8,7 @@
 #include <nap/datetime.h>
 #include <nap/timer.h>
 #include <nap/signalslot.h>
+#include <mathutils.h>
 
 // Forward declare thirdparty-sunset
 class SunSet;
@@ -129,7 +130,6 @@ namespace nap
 		double mPreviousSunset = -1;					///< Yesterday's sunset time in minutes from midnight
 		double mNextSunrise = -1;						///< Tomorrow's sunrise time in minutes from midnight  
 
-
 		int mCurrentSunsetHours;						///< Today's sunset hour component (0-23)  
 		int mCurrentSunsetMinutes;						///< Today's sunset minute component (0-59)  
 		int mMinutesOffsetTimeSunsettingDown;			///< Additional offset (in minutes) after sunset until sun is completely down  : 1h extra to the time of the starting of the sun setting down --> the time the night is dark
@@ -137,11 +137,10 @@ namespace nap
 		float mCurrentPropSun = -1;						///< Sun's progress proportion (0.0-1.0): daytime progress when sun is up, nighttime progress when sun is down
 		int mTimeUntilNextSunchange = -1;				///< Current time in minutes until the sun is goin down, or setting up				
 		bool mSunIsCurrentlyUp;							///< Current daylight status (true = sun is above horizon)  
-
-		long mDeltaUntilNextCalculation = 10;			///< Time remaining (s) until next sunset/sunrise calculation  
+		long mDeltaUntilNextCalculation = 0;			///< Time remaining (s) until next sunset/sunrise calculation  
 
 		nap::SystemTimer mDeltaCalculationTimer;        ///< Timer tracking interval until next required calculation (at next sunset. Settings this to 10s so to not retrigger the calculation of the sunset until mDeltaUntilNextCalculation is properly set inside calculateCurrentSunsetState
-
 		std::unique_ptr<SunSet> mSunset = nullptr;		///< unique ptr to the sunset class
+		nap::SystemTimeStamp mCalcStamp;
 	};
 }
