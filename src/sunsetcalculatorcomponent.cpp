@@ -77,7 +77,6 @@ namespace nap
 		{
 			mPreviousSunset = mCurrentSunset;
 			mCurrentSunrise = mNextSunrise;
-
 			mNextSunrise = calculateNextSunrise(now);
 			mSunset->setCurrentDate(now.getYear(), static_cast<int>(now.getMonth()), now.getDayInTheMonth());
 			mCurrentSunset = mSunset->calcSunset();
@@ -86,13 +85,9 @@ namespace nap
 		mCurrentSunsetHours = std::chrono::duration_cast<std::chrono::hours>(std::chrono::minutes(static_cast<int>(mCurrentSunset) + mMinutesOffsetTimeSunsettingDown)).count();
 		mCurrentSunsetMinutes = static_cast<int>(mCurrentSunset) % 60;
 
-		std::string minutes_logged = std::to_string((static_cast<int>(mCurrentSunrise) % 60));
-		if (minutes_logged.size() < 2) minutes_logged.insert(0,1,'0');
-
-		Logger::info("SunsetCalculatorComponentInstance::calculateCurrentSunsetState sunrise at :	%d:%s", static_cast<int>(mCurrentSunrise / 60), minutes_logged.c_str());
-		minutes_logged = std::to_string(mCurrentSunsetMinutes);
-		if (minutes_logged.size() < 2) minutes_logged.insert(0, 1, '0');
-		Logger::info("SunsetCalculatorComponentInstance::calculateCurrentSunsetState sunset at  :	%d:%s", mCurrentSunsetHours, minutes_logged.c_str());
+		int minutes_logged = static_cast<int>(mCurrentSunrise) % 60;
+		Logger::info("SunsetCalculatorComponentInstance::calculateCurrentSunsetState sunrise at: %.2d:%.2d", static_cast<int>(mCurrentSunrise / 60), minutes_logged);
+		Logger::info("SunsetCalculatorComponentInstance::calculateCurrentSunsetState sunset at:	%.2d:%.2d", mCurrentSunsetHours, mCurrentSunsetMinutes);
 
 		int h = now.getHour();
 		int m = now.getMinute();
@@ -125,7 +120,6 @@ namespace nap
 		auto time_passed_since_midnight = static_cast<double> (h * 60 + m);
 
 		mSunIsCurrentlyUp = true;
-
 		bool sun_up_in_the_sky = true;
 		if (time_passed_since_midnight < mCurrentSunrise || time_passed_since_midnight > mCurrentSunset)
 			sun_up_in_the_sky = false;
