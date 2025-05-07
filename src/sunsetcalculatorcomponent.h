@@ -44,6 +44,13 @@ namespace nap
 		RTTI_ENABLE(ComponentInstance)
 	public:
 
+		enum class EState : int8
+		{
+			Unknown		= -1,	//< Current sunset state is unknown
+			Down		= 0,	//< Current sunset state is down 
+			Up			= 1		//< Current sunset state is up
+		};
+
 		/**
 		 * @param entity the entity this component belongs to.
 		 * @param resource the resource this instance was created from.
@@ -92,20 +99,23 @@ namespace nap
 		 *               - Sun's progress through nighttime when sun is down
 		 *
 		 */
-		float getProp() {return mCurrentPropSun;}
+		float getProp()	 const		{return mCurrentPropSun;}
 
 		/**
 		 * @brief Checks whether the sun is currently above the horizon.
 		 * @return bool `true` if the sun is up (daytime), `false` if down (nighttime).
 		 */
-		bool isUp() {return mSunIsCurrentlyUp;}
+		bool isUp() const			{return mSunState == EState::Up; }
 
 		/**
 		* @return an int value (in minutes) corresponding to the time until the next sunrise or sunset
 		*/
 		int getTimeUntilNextSunCourseChange() {return mTimeUntilNextSunchange;}
 
-		Signal<bool> mSunIsUp;
+		/**
+		 * Listen to this signal to get notified on sunset / sunrise
+		 */
+		Signal<EState> mSunStateChanged;
 
 	private:
 
@@ -130,13 +140,13 @@ namespace nap
 		double mPreviousSunset = -1;					///< Yesterday's sunset time in minutes from midnight
 		double mNextSunrise = -1;						///< Tomorrow's sunrise time in minutes from midnight  
 
-		int mCurrentSunsetHours;						///< Today's sunset hour component (0-23)  
-		int mCurrentSunsetMinutes;						///< Today's sunset minute component (0-59)  
-		int mMinutesOffsetTimeSunsettingDown;			///< Additional offset (in minutes) after sunset until sun is completely down  : 1h extra to the time of the starting of the sun setting down --> the time the night is dark
+		int mCurrentSunsetHours = -1;					///< Today's sunset hour component (0-23)  
+		int mCurrentSunsetMinutes = -1;					///< Today's sunset minute component (0-59)  
+		int mMinutesOffsetTimeSunsettingDown = -1;		///< Additional offset (in minutes) after sunset until sun is completely down  : 1h extra to the time of the starting of the sun setting down --> the time the night is dark
 
 		float mCurrentPropSun = -1;						///< Sun's progress proportion (0.0-1.0): daytime progress when sun is up, nighttime progress when sun is down
 		int mTimeUntilNextSunchange = -1;				///< Current time in minutes until the sun is goin down, or setting up				
-		bool mSunIsCurrentlyUp;							///< Current daylight status (true = sun is above horizon)  
+		EState mSunState = EState::Unknown;				///< Current daylight status (true = sun is above horizon)  
 		long mDeltaUntilNextCalculation = 0;			///< Time remaining (s) until next sunset/sunrise calculation  
 
 		nap::SystemTimer mDeltaCalculationTimer;        ///< Timer tracking interval until next required calculation (at next sunset. Settings this to 10s so to not retrigger the calculation of the sunset until mDeltaUntilNextCalculation is properly set inside calculateCurrentSunsetState
