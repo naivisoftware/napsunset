@@ -31,7 +31,7 @@ namespace nap
 			double mLatitude = 0;					///<  Property: 'latitude' set to use 0	(Greenwich)	->(nul island)
 			double mLongitude = 0;					///<  Property: 'longitude' set to use 0(equator)	->(nul island)
 			int mTimezone = 2;						///<  Property: 'timezone' set to use 2 (Europe's timezone)
-			int mMinutesOffsetSunDown = 0;			///<  Property: 'minutesOffsetSunDown' offset from the moment the sun start setting down to the moment we consider the sun to be completely down - set to 0
+			int mMinutesOffsetSunPhase = 0;			///<  Property: 'minutesoffsetsunphase' offset from the moment the sun start setting down to the moment we consider the sun to be completely down - set to 0
     };
 
 
@@ -142,7 +142,7 @@ namespace nap
 
 		int mCurrentSunsetHours = -1;					///< Today's sunset hour component (0-23)  
 		int mCurrentSunsetMinutes = -1;					///< Today's sunset minute component (0-59)  
-		int mMinutesOffsetTimeSunsettingDown = -1;		///< Additional offset (in minutes) after sunset until sun is completely down  : 1h extra to the time of the starting of the sun setting down --> the time the night is dark
+		int mMinutesOffsetSunPhaseChange = -1;			///< Additional offset (in minutes) after sunset until sun is completely down  : 1h extra to the time of the starting of the sun setting down --> the time the night is dark
 
 		float mCurrentPropSun = -1;						///< Sun's progress proportion (0.0-1.0): daytime progress when sun is up, nighttime progress when sun is down
 		int mTimeUntilNextSunchange = -1;				///< Current time in minutes until the sun is goin down, or setting up				
@@ -152,5 +152,6 @@ namespace nap
 		nap::SystemTimer mDeltaCalculationTimer;        ///< Timer tracking interval until next required calculation (at next sunset. Settings this to 10s so to not retrigger the calculation of the sunset until mDeltaUntilNextCalculation is properly set inside calculateCurrentSunsetState
 		std::unique_ptr<SunSet> mSunset = nullptr;		///< unique ptr to the sunset class
 		nap::SystemTimeStamp mCalcStamp;
+
 	};
 }
