@@ -54,9 +54,9 @@ namespace nap
 		if (time_passed > mDeltaUntilNextCalculation)
 			calculateCurrentSunsetState();
 
-		// Update sun proportions every minute
+		// Update sun proportions every minute or when clock changes
 		auto calc_diff = std::chrono::duration_cast<nap::Minutes>(getCurrentTime() - mCalcStamp);
-		if (calc_diff.count() > 0)
+		if (math::abs<int>(calc_diff.count()) > 0)
 			calculateProp();
 	}
 
@@ -118,41 +118,51 @@ namespace nap
 		int m = now.getMinute();
 
 		auto time_passed_since_midnight = static_cast<double> (h * 60 + m);
-
-		mSunIsCurrentlyUp = true;
-		bool sun_up_in_the_sky = true;
-		if (time_passed_since_midnight < mCurrentSunrise || time_passed_since_midnight > mCurrentSunset)
-			sun_up_in_the_sky = false;
-		
-		if (sun_up_in_the_sky != mSunIsCurrentlyUp)
-		{
-			mSunIsCurrentlyUp = sun_up_in_the_sky;
-			mSunIsUp.trigger(mSunIsCurrentlyUp);
-		}
+		auto current_sun_state = time_passed_since_midnight < mCurrentSunrise || time_passed_since_midnight > mCurrentSunset ?
+			EState::Down : EState::Up;
 
 		auto delta_min = static_cast<double>(mCurrentSunset - mCurrentSunrise);
-		if (!mSunIsCurrentlyUp)
+		switch(current_sun_state)
 		{
-			if (h < 12)
-			{ // morning
-				int time_passed_since_yesterdays_sunset = h * 60 + m + 24 * 60 - (static_cast<int>(mPreviousSunset) + mMinutesOffsetTimeSunsettingDown);		///< in minutes
-				mTimeUntilNextSunchange = static_cast<int>(mCurrentSunrise + h * 60 + m);
-				delta_min = static_cast<double>(mCurrentSunrise + 24 * 60 - (mPreviousSunset + mMinutesOffsetTimeSunsettingDown));
-				mCurrentPropSun = time_passed_since_yesterdays_sunset / delta_min;
-			}
-			else
-			{ // evening
-				auto time_passed_since_sunset = static_cast<double>(h * 60 + m - (mCurrentSunset + mMinutesOffsetTimeSunsettingDown));		///< in minutes
-				mTimeUntilNextSunchange = static_cast<int>(mNextSunrise + 24 * 60 -(h * 60 + m));
-				delta_min = static_cast<double>(mNextSunrise + 24 * 60 - (mCurrentSunset + mMinutesOffsetTimeSunsettingDown));
-				mCurrentPropSun = time_passed_since_sunset / delta_min;
+			case EState::Down:
+			{
+				if (h < 12)
+				{
+					// morning
+					int time_passed_since_yesterdays_sunset = h * 60 + m + 24 * 60 - (static_cast<int>(mPreviousSunset) + mMinutesOffsetTimeSunsettingDown);		///< in minutes
+					mTimeUntilNextSunchange = static_cast<int>(mCurrentSunrise + h * 60 + m);
+					delta_min = static_cast<double>(mCurrentSunrise + 24 * 60 - (mPreviousSunset + mMinutesOffsetTimeSunsettingDown));
+					mCurrentPropSun = time_passed_since_yesterdays_sunset / delta_min;
+				}
+				else
+				{
+					// evening
+					auto time_passed_since_sunset = static_cast<double>(h * 60 + m - (mCurrentSunset + mMinutesOffsetTimeSunsettingDown));		///< in minutes
+					mTimeUntilNextSunchange = static_cast<int>(mNextSunrise + 24 * 60 - (h * 60 + m));
+					delta_min = static_cast<double>(mNextSunrise + 24 * 60 - (mCurrentSunset + mMinutesOffsetTimeSunsettingDown));
+					mCurrentPropSun = time_passed_since_sunset / delta_min;
 
+				}
+				break;
+			}
+			case EState::Up:
+			{
+				mTimeUntilNextSunchange = static_cast<int>(mCurrentSunset + mMinutesOffsetTimeSunsettingDown) - (h * 60 + m);
+				mCurrentPropSun = (time_passed_since_midnight - static_cast<float>(mCurrentSunrise)) / delta_min;
+				break;
+			}
+			default:
+			{
+				assert(false);
+				break;
 			}
 		}
-		else
+
+		// Notify listeners if state changed
+		if (current_sun_state != mSunState)
 		{
-			mTimeUntilNextSunchange = static_cast<int>(mCurrentSunset + mMinutesOffsetTimeSunsettingDown) - (h * 60 + m);
-			mCurrentPropSun = (time_passed_since_midnight - static_cast<float>(mCurrentSunrise)) / delta_min;
+			mSunState = current_sun_state;
+			mSunStateChanged.trigger(current_sun_state);
 		}
 
 		// Store time reference
