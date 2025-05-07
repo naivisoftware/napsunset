@@ -11,10 +11,10 @@
 #include <sunset.h>
 
 RTTI_BEGIN_CLASS(nap::SunsetCalculatorComponent)
-RTTI_PROPERTY("latitude", &nap::SunsetCalculatorComponent::mLatitude, nap::rtti::EPropertyMetaData::Default, "latitude of the location we want to know the sunrise and sundown of")
-RTTI_PROPERTY("longitude", &nap::SunsetCalculatorComponent::mLongitude, nap::rtti::EPropertyMetaData::Default, "longitude of the location we want to know the sunrise and sundown of")
-RTTI_PROPERTY("timezone", &nap::SunsetCalculatorComponent::mTimezone, nap::rtti::EPropertyMetaData::Default, "timezone to return the date in")
-RTTI_PROPERTY("minutes offset to sundown", &nap::SunsetCalculatorComponent::mMinutesOffsetSunDown, nap::rtti::EPropertyMetaData::Default, "sundown offset from the moment the sun starts to set down");
+RTTI_PROPERTY("Latitude", &nap::SunsetCalculatorComponent::mLatitude, nap::rtti::EPropertyMetaData::Default, "latitude of the location we want to know the sunrise and sundown of")
+RTTI_PROPERTY("Longitude", &nap::SunsetCalculatorComponent::mLongitude, nap::rtti::EPropertyMetaData::Default, "longitude of the location we want to know the sunrise and sundown of")
+RTTI_PROPERTY("TimeZone", &nap::SunsetCalculatorComponent::mTimezone, nap::rtti::EPropertyMetaData::Default, "timezone to return the date in")
+RTTI_PROPERTY("Minutes Offset To SunDown", &nap::SunsetCalculatorComponent::mMinutesOffsetSunDown, nap::rtti::EPropertyMetaData::Default, "sundown offset from the moment the sun starts to set down");
 RTTI_END_CLASS
 
 RTTI_BEGIN_CLASS_NO_DEFAULT_CONSTRUCTOR(nap::SunsetCalculatorComponentInstance)
