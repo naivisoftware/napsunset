@@ -150,7 +150,7 @@ namespace nap
 		long mDeltaUntilNextCalculation = 0;			///< Time remaining (s) until next sunset/sunrise calculation  
 
 		nap::SystemTimer mDeltaCalculationTimer;        ///< Timer tracking interval until next required calculation (at next sunset. Settings this to 10s so to not retrigger the calculation of the sunset until mDeltaUntilNextCalculation is properly set inside calculateCurrentSunsetState
-		std::unique_ptr<SunSet> mSunset = nullptr;		///< unique ptr to the sunset class
+		std::unique_ptr<SunSet> mSunset;				///< unique ptr to the sunset class
 		nap::SystemTimeStamp mCalcStamp;
 
 	};
