@@ -96,15 +96,19 @@ namespace nap
 
 		int h = now.getHour();
 		int m = now.getMinute();
+		int s = now.getSecond();
+
+		double current_time_in_s = static_cast<double>((h * 60 + m) * 60 + s);
 
 		// in seconds
-		mDeltaUntilNextCalculation = (mCurrentSunset - (h * 60 + m)) * 60;
+		mDeltaUntilNextCalculation = mCurrentSunset * 60 - current_time_in_s;
 
 		// time until it's tomorrow + 1s
-		auto time_until_tomorrow = static_cast<double>((24 * 60 - (h * 60 + m)) * 60 + 1);
+		auto time_until_tomorrow = static_cast<double>(24 * 60 * 60 - current_time_in_s + 1);
 
 		// check if we should recalculate when the day changes (00:00) or at the next sunset.
-		if (mDeltaUntilNextCalculation > time_until_tomorrow)
+		// delta time can be negative if the time is after the sunset
+		if (mDeltaUntilNextCalculation > time_until_tomorrow || mDeltaUntilNextCalculation < 0)
 			mDeltaUntilNextCalculation = time_until_tomorrow;
 
 		mDeltaCalculationTimer.reset();
@@ -123,7 +127,7 @@ namespace nap
 		int m = now.getMinute();
 
 		auto time_passed_since_midnight = static_cast<double> (h * 60 + m);
-		auto current_sun_state = time_passed_since_midnight < mCurrentSunrise || time_passed_since_midnight > mCurrentSunset ?
+		auto current_sun_state = time_passed_since_midnight < mCurrentSunrise || time_passed_since_midnight >= mCurrentSunset ?
 			EState::Down : EState::Up;
 
 		auto delta_min = static_cast<double>(mCurrentSunset - mCurrentSunrise);
@@ -167,7 +171,7 @@ namespace nap
 		if (current_sun_state != mSunState)
 		{
 			mSunState = current_sun_state;
-			mSunStateChanged.trigger(current_sun_state);
+  			mSunStateChanged.trigger(current_sun_state);
 		}
 
 		// Store time reference
