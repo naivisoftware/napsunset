@@ -17,10 +17,9 @@ RTTI_BEGIN_ENUM(nap::SunsetCalculatorComponentInstance::EState)
 RTTI_END_ENUM
 
 RTTI_BEGIN_CLASS(nap::SunsetCalculatorComponent)
-	RTTI_PROPERTY("Latitude", &nap::SunsetCalculatorComponent::mLatitude, nap::rtti::EPropertyMetaData::Default, "latitude of the location we want to know the sunrise and sundown of")
-	RTTI_PROPERTY("Longitude", &nap::SunsetCalculatorComponent::mLongitude, nap::rtti::EPropertyMetaData::Default, "longitude of the location we want to know the sunrise and sundown of")
-	RTTI_PROPERTY("TimeZone", &nap::SunsetCalculatorComponent::mTimezone, nap::rtti::EPropertyMetaData::Default, "timezone to return the date in")
-	RTTI_PROPERTY("Minutes Offset Sun Phase", &nap::SunsetCalculatorComponent::mMinutesOffsetSunPhase, nap::rtti::EPropertyMetaData::Default, "minutes offset from the moment the sun starts transitionning ([-] in the morning ");
+	RTTI_PROPERTY("Latitude", &nap::SunsetCalculatorComponent::mLatitude, nap::rtti::EPropertyMetaData::Default, "Latitude of the location we want to know the sunrise and sundown of")
+	RTTI_PROPERTY("Longitude", &nap::SunsetCalculatorComponent::mLongitude, nap::rtti::EPropertyMetaData::Default, "Longitude of the location we want to know the sunrise and sundown of")
+	RTTI_PROPERTY("TimeZone", &nap::SunsetCalculatorComponent::mTimezone, nap::rtti::EPropertyMetaData::Default, "Timezone at Longitude")
 RTTI_END_CLASS
 
 RTTI_BEGIN_CLASS_NO_DEFAULT_CONSTRUCTOR(nap::SunsetCalculatorComponentInstance)
@@ -32,9 +31,8 @@ namespace nap
 {   
 	SunsetCalculatorComponentInstance::SunsetCalculatorComponentInstance(EntityInstance& entity, Component& resource) :
 		ComponentInstance(entity, resource),
-		mSunset(std::make_unique<SunSet>())
+		mModel(std::make_unique<SunSet>())
 	{ }
-
 
 
 	// this is needed for the PIMPL (Pointer To Implementation) to work with the unique_ptr to Sunset in the header
@@ -43,168 +41,60 @@ namespace nap
 
 	bool SunsetCalculatorComponentInstance::init(utility::ErrorState& errorState)
     {
+		// Set position
 		auto* resource = getComponent<nap::SunsetCalculatorComponent>();
-		mMinutesOffsetSunPhaseChange = resource->mMinutesOffsetSunPhase;
-		mSunset->setPosition(resource->mLatitude, resource->mLongitude, resource->mTimezone);
+		mTimezone = resource->mTimezone;
+		mLongitude = resource->mLongitude;
+		mLatitude = resource->mLatitude;
 
-		mDeltaCalculationTimer.start();
-		calculateCurrentSunsetState();
+		// Initialize model
+		mModel->setPosition(resource->mLatitude, resource->mLongitude, resource->mTimezone );
 
+		// Compute
+		update(0.0);
         return true;
     }
 
 
 	void SunsetCalculatorComponentInstance::update(double delta)
 	{
-		// Update sunset state when time has passed
-		auto time_passed = mDeltaCalculationTimer.getSeconds().count();
+		// Get current date-time
+		auto date_time = getCurrentDateTime();
 
-
-		if (time_passed > mDeltaUntilNextCalculation)
-			calculateCurrentSunsetState();
-
-		// Update sun proportions every minute or when clock changes
-		auto calc_diff = std::chrono::duration_cast<nap::Minutes>(getCurrentTime() - mCalcStamp);
-		if (math::abs<int>(calc_diff.count()) > 0)
-			calculateProp();
-	}
-
-
-	void SunsetCalculatorComponentInstance::calculateCurrentSunsetState()
-	{
-		auto now = getCurrentDateTime();
-		if (mPreviousSunset == -1)
+		// If day changed, update sunset / sunrise information
+		if (mDay != date_time.getDay())
 		{
+			// Get null (midnight) for current date/time
+			auto null_time = createTimestamp(date_time.getYear(), static_cast<int>(date_time.getMonth()), date_time.getDayInTheMonth(), 0, 0, 0);
 
-			mPreviousSunset = calculatePreviousSunset(now) - static_cast<double>(mMinutesOffsetSunPhaseChange);
-			mNextSunrise = calculateNextSunrise(now) + static_cast<double>(mMinutesOffsetSunPhaseChange);
-			mSunset->setCurrentDate(now.getYear(), static_cast<int>(now.getMonth()), now.getDayInTheMonth());
-			mCurrentSunrise = mSunset->calcSunrise() + static_cast<double>(mMinutesOffsetSunPhaseChange);
-			mCurrentSunset = mSunset->calcSunset() - static_cast<double>(mMinutesOffsetSunPhaseChange);
-			
-		}
-		else
-		{
-			mPreviousSunset = mCurrentSunset;
-			mCurrentSunrise = mNextSunrise;
-			mNextSunrise = calculateNextSunrise(now);
-			mSunset->setCurrentDate(now.getYear(), static_cast<int>(now.getMonth()), now.getDayInTheMonth());
-			mCurrentSunset = mSunset->calcSunset();
+			// Update current date
+			mModel->setCurrentDate(date_time.getYear(), static_cast<int>(date_time.getMonth()), date_time.getDayInTheMonth());
+
+			// Compute sunrise
+			static constexpr double mms = 60.0 * 1000.0;
+			mSunRiseMinute = mModel->calcSunrise();
+			mSunRiseStamp = null_time + Milliseconds(static_cast<int64>(mSunRiseMinute * mms));
+			mSunRise = DateTime(mSunRiseStamp, DateTime::ConversionMode::Local);
+
+			// Compute sunset
+			mSunSetMinute = mModel->calcSunset();
+			mSunSetStamp = null_time + Milliseconds(static_cast<int64>(mSunSetMinute * mms));
+			mSunset = DateTime(mSunSetStamp, DateTime::ConversionMode::Local);
+
+			// Store computed day
+			mDay = date_time.getDay();
 		}
 
-		mCurrentSunsetHours = std::chrono::duration_cast<std::chrono::hours>(std::chrono::minutes(static_cast<int>(mCurrentSunset))).count();
-		mCurrentSunsetMinutes = static_cast<int>(mCurrentSunset) % 60;
+		// Check if we need to notify listeners
+		const auto& current = date_time.getTimeStamp();
+		auto current_state = current > mSunRiseStamp && current < mSunSetStamp ?
+			EState::Up : EState::Down;
 
-		int minutes_logged = static_cast<int>(mCurrentSunrise) % 60;
-		Logger::info("SunsetCalculatorComponentInstance::calculateCurrentSunsetState sunrise at: %.2d:%.2d", static_cast<int>(mCurrentSunrise / 60), minutes_logged);
-		Logger::info("SunsetCalculatorComponentInstance::calculateCurrentSunsetState sunset at:	%.2d:%.2d", mCurrentSunsetHours, mCurrentSunsetMinutes);
-
-		int h = now.getHour();
-		int m = now.getMinute();
-		int s = now.getSecond();
-
-		double current_time_in_s = static_cast<double>((h * 60 + m) * 60 + s);
-
-		// in seconds
-		mDeltaUntilNextCalculation = mCurrentSunset * 60 - current_time_in_s;
-
-		// time until it's tomorrow + 1s
-		auto time_until_tomorrow = static_cast<double>(24 * 60 * 60 - current_time_in_s + 1);
-
-		// check if we should recalculate when the day changes (00:00) or at the next sunset.
-		// delta time can be negative if the time is after the sunset
-		if (mDeltaUntilNextCalculation > time_until_tomorrow || mDeltaUntilNextCalculation < 0)
-			mDeltaUntilNextCalculation = time_until_tomorrow;
-
-		mDeltaCalculationTimer.reset();
-
-		// let's calculate the proportion right now, so
-		// [1] on init it appears right away
-		// [2] when the day or sunset change they appear right away
-		calculateProp();
-	}
-
-
-	void SunsetCalculatorComponentInstance::calculateProp()
-	{
-		auto now = getCurrentDateTime();
-		int h = now.getHour();
-		int m = now.getMinute();
-
-		auto time_passed_since_midnight = static_cast<double> (h * 60 + m);
-		auto current_sun_state = time_passed_since_midnight < mCurrentSunrise || time_passed_since_midnight >= mCurrentSunset ?
-			EState::Down : EState::Up;
-
-		auto delta_min = static_cast<double>(mCurrentSunset - mCurrentSunrise);
-		switch(current_sun_state)
+		// Notify listeners
+		if (current_state != mState)
 		{
-			case EState::Down:
-			{
-				if (h < 12)
-				{
-					// morning
-					auto time_passed_since_yesterdays_sunset = static_cast<double>(h * 60 + m + 24 * 60) - mPreviousSunset;		///< in minutes
-					mTimeUntilNextSunchange = static_cast<int>(mCurrentSunrise) - (h * 60 + m);
-					delta_min = static_cast<double>(mCurrentSunrise + 24 * 60) - mPreviousSunset;
-					mCurrentPropSun = time_passed_since_yesterdays_sunset / delta_min;
-				}
-				else
-				{
-					// evening
-					auto time_passed_since_sunset = static_cast<double>(h * 60 + m) - mCurrentSunset;		///< in minutes
-					mTimeUntilNextSunchange = static_cast<int>(mNextSunrise) + 24 * 60 - (h * 60 + m);
-					delta_min = static_cast<double>(mNextSunrise + 24 * 60) - mCurrentSunset;
-					mCurrentPropSun = time_passed_since_sunset / delta_min;
-
-				}
-				break;
-			}
-			case EState::Up:
-			{
-				mTimeUntilNextSunchange = static_cast<int>(mCurrentSunset) - (h * 60 + m);
-				mCurrentPropSun = (time_passed_since_midnight - static_cast<float>(mCurrentSunrise)) / delta_min;
-				break;
-			}
-			default:
-			{
-				assert(false);
-				break;
-			}
+			mState = current_state;
+			mSunStateChanged(mState);
 		}
-
-		// Notify listeners if state changed
-		if (current_sun_state != mSunState)
-		{
-			mSunState = current_sun_state;
-  			mSunStateChanged.trigger(current_sun_state);
-		}
-
-		// Store time reference
-		mCalcStamp = getCurrentTime();
-	}
-
-
-	double SunsetCalculatorComponentInstance::calculatePreviousSunset(DateTime date)
-	{
-		// go back one day using std::chrono
-		SystemTimeStamp sysTime = date.getTimeStamp();
-		sysTime -= std::chrono::hours(24);
-		date.setTimeStamp(sysTime);
-
-		mSunset->setCurrentDate(date.getYear(), static_cast<int>(date.getMonth()), date.getDayInTheMonth());
-		return mSunset->calcSunset();
-		
-	}
-
-
-	double SunsetCalculatorComponentInstance::calculateNextSunrise(DateTime date)
-	{
-		// go forward one day using std::chrono
-		SystemTimeStamp sysTime = date.getTimeStamp();
-		sysTime += std::chrono::hours(24);
-		date.setTimeStamp(sysTime);
-
-		mSunset->setCurrentDate(date.getYear(), static_cast<int>(date.getMonth()), date.getDayInTheMonth());
-		return mSunset->calcSunrise();
 	}
 }
