@@ -26,11 +26,11 @@ namespace nap
 		DECLARE_COMPONENT(SunsetCalculatorComponent, SunsetCalculatorComponentInstance)
 
 		public:
-
-			// Geographic coordinates and timezone for calculating sun position
-			double mLatitude = 0;					///<  Property: 'latitude' set to use 0	(Greenwich)	->(nul island)
-			double mLongitude = 0;					///<  Property: 'longitude' set to use 0(equator)	->(nul island)
-			int mTimezone = 1;						///<  Property: 'timezone' set to use 2 (Europe's timezone)
+			double mLatitude = 0;					///< Property: 'Latitude' set to use 0	(Greenwich)	->(nul island)
+			double mLongitude = 0;					///< Property: 'Longitude' set to use 0(equator)	->(nul island)
+			int mTimezone = 1;						///< Property: 'Timezone' timezone, excluding daylight savings
+    		double mSunriseOffset = 0.0;			///< Property: 'SunriseOffset' sunrise offset in minutes
+    		double mSunsetOffset = 0.0;				///< Property: 'SunsetOffset' sunset offset in minutes
     };
 
 
@@ -121,10 +121,12 @@ namespace nap
 		EDay mDay = EDay::Unknown;						///< current day
 
 		SystemTimeStamp mSunRiseStamp;					///< Sunrise timestamp
-		DateTime mSunRise;								///< Sunrise date-time
+		DateTime mSunRise;								///< Sunrise date-time=
+		double mSunriseOffset = 0.0;					///< Sunrise offset in minutes
 
 		SystemTimeStamp mSunSetStamp;					///< Sunset timestamp
 		DateTime mSunset;								///< Sunset date-time
+		double mSunsetOffset = 0.0;						///< Sunset offset in minutes
 
 		int mTimezone = 0;								///< Location timezone
 		double mLatitude = 0;							///< Location latitude

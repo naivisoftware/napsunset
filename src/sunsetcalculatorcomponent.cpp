@@ -19,7 +19,9 @@ RTTI_END_ENUM
 RTTI_BEGIN_CLASS(nap::SunsetCalculatorComponent)
 	RTTI_PROPERTY("Latitude", &nap::SunsetCalculatorComponent::mLatitude, nap::rtti::EPropertyMetaData::Default, "Latitude of the location we want to know the sunrise and sundown of")
 	RTTI_PROPERTY("Longitude", &nap::SunsetCalculatorComponent::mLongitude, nap::rtti::EPropertyMetaData::Default, "Longitude of the location we want to know the sunrise and sundown of")
-	RTTI_PROPERTY("TimeZone", &nap::SunsetCalculatorComponent::mTimezone, nap::rtti::EPropertyMetaData::Default, "Timezone at Longitude")
+	RTTI_PROPERTY("TimeZone", &nap::SunsetCalculatorComponent::mTimezone, nap::rtti::EPropertyMetaData::Default, "Timezone at Longitude excluding daylight saving")
+	RTTI_PROPERTY("SunriseOffset", &nap::SunsetCalculatorComponent::mSunriseOffset, nap::rtti::EPropertyMetaData::Default, "Sunrise offset in minutes")
+	RTTI_PROPERTY("SunsetOffset", &nap::SunsetCalculatorComponent::mSunsetOffset, nap::rtti::EPropertyMetaData::Default, "Sunrise offset in minutes")
 RTTI_END_CLASS
 
 RTTI_BEGIN_CLASS_NO_DEFAULT_CONSTRUCTOR(nap::SunsetCalculatorComponentInstance)
@@ -46,6 +48,8 @@ namespace nap
 		mTimezone = resource->mTimezone;
 		mLongitude = resource->mLongitude;
 		mLatitude = resource->mLatitude;
+		mSunriseOffset = resource->mSunriseOffset;
+		mSunsetOffset = resource->mSunsetOffset;
 
 		// Compute
 		update(0.0);
@@ -73,12 +77,12 @@ namespace nap
 
 			// Compute sunrise
 			static constexpr double mms = 60.0 * 1000.0;
-			double sunrise = mModel->calcSunrise();
+			double sunrise = mModel->calcSunrise() + mSunriseOffset;
 			mSunRiseStamp = null_time + Milliseconds(static_cast<int64>(sunrise * mms));
 			mSunRise = DateTime(mSunRiseStamp, DateTime::ConversionMode::Local);
 
 			// Compute sunset
-			double sunset = mModel->calcSunset();
+			double sunset = mModel->calcSunset() + mSunsetOffset;
 			mSunSetStamp = null_time + Milliseconds(static_cast<int64>(sunset * mms));
 			mSunset = DateTime(mSunSetStamp, DateTime::ConversionMode::Local);
 
