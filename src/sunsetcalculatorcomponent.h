@@ -18,7 +18,7 @@ namespace nap
 	class SunsetCalculatorComponentInstance;
 
 	/**
-	 * Calculates sunset and sunrise for a given lat and longitude
+	 * Calculates local sunset and sunrise for a given lat and longitude.
 	 */
     class NAPAPI SunsetCalculatorComponent: public Component
     {
@@ -35,7 +35,10 @@ namespace nap
 
 
 	/**
-	 * Calculates sunset and sunrise for a given lat and longitude
+	 * Calculates local sunset and sunrise for a given lat and longitude, including offsets
+	 * Listen to 'mSunStateChanged, 'mSunUp' or 'mSunDown' signals to receive sunrise and sunset events.
+	 * Note that this component uses the system local time, it does not figure out the timezone
+	 * for the given lon and latitude.
 	 */
 	class NAPAPI SunsetCalculatorComponentInstance : public ComponentInstance
 	{
