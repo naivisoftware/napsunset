@@ -75,7 +75,7 @@ namespace nap
 		mGuiService->selectWindow(mRenderWindow);
 
 		// Draw some gui elements
-		ImGui::Begin("Controls");
+		ImGui::Begin("Sunset");
 
 		// Display some extra info
 		bool is_up = sunset.isUp();
@@ -84,6 +84,7 @@ namespace nap
 		ImGui::TextColored(is_up ? theme.mHighlightColor2 : theme.mHighlightColor4, "The sun is: %s", is_up ? "Up" : "Down");
 		ImGui::TextColored(theme.mHighlightColor1, "Sunrise: %s", sunset.getSunRise().toString().c_str());
 		ImGui::TextColored(theme.mHighlightColor3, "Sunset:  %s", sunset.getSunSet().toString().c_str());
+		ImGui::Text("lat: %.2f, lon: %.2f", sunset.getLatitude(), sunset.getLongitude());
 		ImGui::Text(utility::stringFormat("Framerate: %.02f", getCore().getFramerate()).c_str());
 		ImGui::End();
 	}
