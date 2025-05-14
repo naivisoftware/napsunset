@@ -84,15 +84,11 @@ namespace nap
 		ImGui::TextColored(is_up ? theme.mHighlightColor2 : theme.mHighlightColor4, "The sun is: %s", is_up ? "Up" : "Down");
 		ImGui::TextColored(theme.mHighlightColor1, "Sunrise: %s", sunset.getSunRise().toString().c_str());
 		ImGui::TextColored(theme.mHighlightColor3, "Sunset:  %s", sunset.getSunSet().toString().c_str());
-
-		//ImGui::TextColored(theme.mHighlightColor1, "%s course percentage in the %s = %f", is_up ? "Sun" : "Moon", is_up ? "sky" : "night", sunsetCalculatorComponentInstance.getProp());
-		//ImGui::TextColored(theme.mHighlightColor3, "Time until next sun course change (%s) : %i minutes", is_up ? "sunset" : "sunrise", sunsetCalculatorComponentInstance.getTimeUntilNextSunCourseChange());
-
 		ImGui::Text(utility::stringFormat("Framerate: %.02f", getCore().getFramerate()).c_str());
 		ImGui::End();
 	}
-	
-	
+
+
 	// Render app
 	void SunsetExampleApp::render()
 	{
@@ -132,14 +128,14 @@ namespace nap
 		// Proceed to next frame
 		mRenderService->endFrame();
 	}
-	
+
 
 	void SunsetExampleApp::windowMessageReceived(WindowEventPtr windowEvent)
 	{
 		mRenderService->addEvent(std::move(windowEvent));
 	}
-	
-	
+
+
 	void SunsetExampleApp::inputMessageReceived(InputEventPtr inputEvent)
 	{
 		if (inputEvent->get_type().is_derived_from(RTTI_OF(nap::KeyPressEvent)))
@@ -157,7 +153,7 @@ namespace nap
 		mInputService->addEvent(std::move(inputEvent));
 	}
 
-	
+
 	int SunsetExampleApp::shutdown()
 	{
 		return 0;
