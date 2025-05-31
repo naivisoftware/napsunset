@@ -96,6 +96,16 @@ namespace nap
 		 */
 		Signal<EState> mSunStateChanged;
 
+		/**
+		 * Listen to this signal to get notified of sunrise
+		 */
+		Signal<> mSunUp;
+
+		/**
+		 * Listen to this signal to get notifief of sunset
+		 */
+		Signal<> mSunDown;
+
 	private:
 		EState mState = EState::Unknown;				///< Current daylight status (true = sun is above horizon)
 		std::unique_ptr<SunSet> mModel;					///< unique ptr to the sunset class

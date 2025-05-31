@@ -16,7 +16,7 @@ RTTI_BEGIN_CLASS_NO_DEFAULT_CONSTRUCTOR(nap::SunsetExampleApp)
 	RTTI_CONSTRUCTOR(nap::Core&)
 RTTI_END_CLASS
 
-namespace nap 
+namespace nap
 {
 	/**
 	 * Initialize all the resources and instances used for drawing
@@ -61,29 +61,32 @@ namespace nap
 		// All done!
 		return true;
 	}
-	
-	
+
+
 	// Update app
 	void SunsetExampleApp::update(double deltaTime)
 	{
 		// Use a default input router to forward input events (recursively) to all input components in the default scene
 		nap::DefaultInputRouter input_router(true);
 		mInputService->processWindowEvents(*mRenderWindow, input_router, { &mScene->getRootEntity() });
-		auto& sunsetCalculatorComponentInstance = mSunsetEntity->getComponent<SunsetCalculatorComponentInstance>();
+		auto& sunset = mSunsetEntity->getComponent<SunsetCalculatorComponentInstance>();
 
 		// Select GUI window
 		mGuiService->selectWindow(mRenderWindow);
-		
+
 		// Draw some gui elements
 		ImGui::Begin("Controls");
 
 		// Display some extra info
-		bool is_up = sunsetCalculatorComponentInstance.isUp();
+		bool is_up = sunset.isUp();
 		const auto& theme = mGuiService->getPalette();
 		ImGui::Text(getCurrentDateTime().toString().c_str());
 		ImGui::TextColored(is_up ? theme.mHighlightColor2 : theme.mHighlightColor4, "The sun is: %s", is_up ? "Up" : "Down");
-		ImGui::TextColored(theme.mHighlightColor1, "%s course percentage in the %s = %f", is_up ? "Sun" : "Moon", is_up ? "sky" : "night", sunsetCalculatorComponentInstance.getProp());
-		ImGui::TextColored(theme.mHighlightColor3, "Time until next sun course change (%s) : %i minutes", is_up ? "sunset" : "sunrise", sunsetCalculatorComponentInstance.getTimeUntilNextSunCourseChange());
+		ImGui::TextColored(theme.mHighlightColor1, "Sunrise: %s", sunset.getSunRise().toString().c_str());
+		ImGui::TextColored(theme.mHighlightColor3, "Sunset:  %s", sunset.getSunSet().toString().c_str());
+
+		//ImGui::TextColored(theme.mHighlightColor1, "%s course percentage in the %s = %f", is_up ? "Sun" : "Moon", is_up ? "sky" : "night", sunsetCalculatorComponentInstance.getProp());
+		//ImGui::TextColored(theme.mHighlightColor3, "Time until next sun course change (%s) : %i minutes", is_up ? "sunset" : "sunrise", sunsetCalculatorComponentInstance.getTimeUntilNextSunCourseChange());
 
 		ImGui::Text(utility::stringFormat("Framerate: %.02f", getCore().getFramerate()).c_str());
 		ImGui::End();

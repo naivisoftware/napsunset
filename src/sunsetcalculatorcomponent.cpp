@@ -48,7 +48,7 @@ namespace nap
 		mLatitude = resource->mLatitude;
 
 		// Initialize model
-		mModel->setPosition(resource->mLatitude, resource->mLongitude, resource->mTimezone );
+		mModel->setPosition(mLatitude, mLongitude, mTimezone);
 
 		// Compute
 		update(0.0);

@@ -128,25 +128,6 @@
             }
         },
         {
-            "Type": "nap::ParameterGUI",
-            "mID": "ParameterGUI",
-            "Serializable": true,
-            "Group": "SunsetGUI"
-        },
-        {
-            "Type": "nap::ParameterGroup",
-            "mID": "Parameters",
-            "Parameters": [],
-            "Groups": [
-                {
-                    "Type": "nap::ParameterGroup",
-                    "mID": "SunsetGUI",
-                    "Parameters": [],
-                    "Groups": []
-                }
-            ]
-        },
-        {
             "Type": "nap::RenderWindow",
             "mID": "Window",
             "Borderless": false,
