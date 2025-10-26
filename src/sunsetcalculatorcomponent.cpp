@@ -47,11 +47,10 @@ namespace nap
 		mLongitude = resource->mLongitude;
 		mLatitude = resource->mLatitude;
 
-		// Initialize model
-		mModel->setPosition(mLatitude, mLongitude, mTimezone);
-
 		// Compute
 		update(0.0);
+
+		// All done
         return true;
     }
 
@@ -67,18 +66,20 @@ namespace nap
 			// Get null (midnight) for current date/time
 			auto null_time = createTimestamp(date_time.getYear(), static_cast<int>(date_time.getMonth()), date_time.getDayInTheMonth(), 0, 0, 0);
 
-			// Update current date
+			// Compute sunset / sunrise for current day -> add 1 hour if daylight saving is still active
+			bool dst = DateTime(null_time, DateTime::ConversionMode::Local).isDaylightSaving();
 			mModel->setCurrentDate(date_time.getYear(), static_cast<int>(date_time.getMonth()), date_time.getDayInTheMonth());
+			mModel->setPosition(mLatitude, mLongitude, dst ? mTimezone + 1 : mTimezone);
 
 			// Compute sunrise
 			static constexpr double mms = 60.0 * 1000.0;
-			mSunRiseMinute = mModel->calcSunrise();
-			mSunRiseStamp = null_time + Milliseconds(static_cast<int64>(mSunRiseMinute * mms));
+			double sunrise = mModel->calcSunrise();
+			mSunRiseStamp = null_time + Milliseconds(static_cast<int64>(sunrise * mms));
 			mSunRise = DateTime(mSunRiseStamp, DateTime::ConversionMode::Local);
 
 			// Compute sunset
-			mSunSetMinute = mModel->calcSunset();
-			mSunSetStamp = null_time + Milliseconds(static_cast<int64>(mSunSetMinute * mms));
+			double sunset = mModel->calcSunset();
+			mSunSetStamp = null_time + Milliseconds(static_cast<int64>(sunset * mms));
 			mSunset = DateTime(mSunSetStamp, DateTime::ConversionMode::Local);
 
 			// Store computed day

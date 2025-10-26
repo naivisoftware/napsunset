@@ -30,7 +30,7 @@ namespace nap
 			// Geographic coordinates and timezone for calculating sun position
 			double mLatitude = 0;					///<  Property: 'latitude' set to use 0	(Greenwich)	->(nul island)
 			double mLongitude = 0;					///<  Property: 'longitude' set to use 0(equator)	->(nul island)
-			int mTimezone = 2;						///<  Property: 'timezone' set to use 2 (Europe's timezone)
+			int mTimezone = 1;						///<  Property: 'timezone' set to use 2 (Europe's timezone)
     };
 
 
@@ -71,25 +71,34 @@ namespace nap
 		void update(double deltaTime) override;
 
 		/**
-		 * @brief Checks whether the sun is currently above the horizon.
-		 * @return bool `true` if the sun is up (daytime), `false` if down (nighttime).
-		 */
-		bool isUp() const								{ return mState == EState::Up; }
-
-		/**
 		 * @return current sun state (up or down)
 		 */
 		EState getState() const							{ return mState; }
 
 		/**
-		 * @return sunset time for current day
+		 * @return local sunset time
 		 */
 		const DateTime& getSunSet() const				{ return mSunset; }
 
 		/**
-		 * @return sunrise time for current day
+		 * @return local sunrise time
 		 */
 		const DateTime& getSunRise() const				{ return mSunRise; }
+
+		/**
+		 * @return latitude
+		 */
+		double getLatitude() const						{ return mLatitude; }
+
+		/**
+		 * @return longitude
+		 */
+		double getLongitude() const						{ return mLongitude; }
+
+		/**
+		 * @return bool `true` if the sun is up (daytime), `false` if down (nighttime).
+		 */
+		bool isUp() const								{ return mState == EState::Up; }
 
 		/**
 		 * Listen to this signal to get notified on sunset / sunrise
@@ -111,11 +120,9 @@ namespace nap
 		std::unique_ptr<SunSet> mModel;					///< unique ptr to the sunset class
 		EDay mDay = EDay::Unknown;						///< current day
 
-		double mSunRiseMinute = 0;						///< Minutes past midnight for sunrise
 		SystemTimeStamp mSunRiseStamp;					///< Sunrise timestamp
 		DateTime mSunRise;								///< Sunrise date-time
 
-		double mSunSetMinute =  0;						///< Minutes past midnight for sunset
 		SystemTimeStamp mSunSetStamp;					///< Sunset timestamp
 		DateTime mSunset;								///< Sunset date-time
 
